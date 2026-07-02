@@ -634,6 +634,9 @@
   <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
     Two honest limits: a browser tab can't reliably play full-length audio or fire notifications once it's fully closed — the native app build handles real background prayer alerts. And a true lock-screen/home-screen widget isn't possible for a web app at all; that would need the native app compiled with a platform-specific widget extension (see its README).
   </p>
+  <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
+    The Hijri date is calculated (the standard tabular Islamic calendar), not read from a browser calendar API, so it's consistent on every device — it can occasionally be a day off from your local mosque's moon-sighting-based date, same as any calculated Islamic calendar.
+  </p>
   <button class="btn btn-ghost" id="closeSheetBtn" style="width:100%;">Close</button>
 </div>
 
@@ -786,30 +789,63 @@ function fmtTime(date, use24){
 
 /* ============================================================
    2. HIJRI DATE
+   A previous version used Intl.DateTimeFormat("en-u-ca-islamic-umalqura")
+   for this. That silently misbehaves on browsers/OSes without full ICU
+   data for the Islamic calendar: instead of throwing an error it quietly
+   falls back to the Gregorian calendar while still claiming to format an
+   Islamic date — so "today" could render as "July 2, 2026" where it
+   should say "Muharram 16, 1448 AH", with no indication anything was
+   wrong. That's exactly the bug that was reported.
+   The fix: compute the Hijri date ourselves with the standard tabular
+   (civil) Islamic calendar algorithm below. It has no dependency on
+   browser/OS calendar support at all, so every visitor sees the same
+   correct month names. It's typically within a day of the official
+   Umm al-Qura calendar (which follows real moon-sighting adjustments
+   rather than a fixed pattern) — verified against Node's own working
+   Intl implementation across a spread of test dates before shipping.
 ============================================================ */
+const HIJRI_MONTH_NAMES = [
+  "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani",
+  "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Sha'ban",
+  "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
+];
+
+function gregorianToJD(year, month, day){
+  const a = Math.floor((14 - month) / 12);
+  const y = year + 4800 - a;
+  const m = month + 12*a - 3;
+  return day + Math.floor((153*m + 2) / 5) + 365*y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400) - 32045;
+}
+
+function jdToHijri(jd){
+  const epoch = 1948440; // Julian day of 1 Muharram 1 AH in the tabular Islamic calendar
+  let l = jd - epoch + 10632;
+  const n = Math.floor((l - 1) / 10631);
+  l = l - 10631*n + 354;
+  const j = Math.floor((10985 - l) / 5316) * Math.floor((50*l) / 17719) + Math.floor(l / 5670) * Math.floor((43*l) / 15238);
+  l = l - Math.floor((30 - j) / 15) * Math.floor((17719*j) / 50) - Math.floor(j / 16) * Math.floor((15238*j) / 43) + 29;
+  const month = Math.floor((24*l) / 709);
+  const day = l - Math.floor((709*month) / 24);
+  const year = 30*n + j - 30;
+  return { year, month, day };
+}
+
 function getHijri(date){
-  try{
-    const fmt = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { day:"numeric", month:"long", year:"numeric" });
-    const parts = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { day:"numeric", month:"numeric", year:"numeric" }).formatToParts(date);
-    const monthNum = parseInt(parts.find(p=>p.type==="month").value, 10);
-    const dayNum = parseInt(parts.find(p=>p.type==="day").value, 10);
-    return { label: fmt.format(date), month: monthNum, day: dayNum };
-  } catch(e){
-    return { label: "", month: null, day: null };
-  }
+  const jd = gregorianToJD(date.getFullYear(), date.getMonth()+1, date.getDate());
+  const h = jdToHijri(jd);
+  const monthName = HIJRI_MONTH_NAMES[h.month - 1] || "";
+  return { label: `${monthName} ${h.day}, ${h.year} AH`, month: h.month, day: h.day, year: h.year };
 }
 
 // Scans forward (bounded to ~380 days) to find how many days until the next
-// 1st of Ramadan. Returns null if the Hijri calendar API is unavailable.
+// 1st of Ramadan.
 function daysUntilRamadan(){
-  try{
-    for (let i=0; i<380; i++){
-      const d = new Date();
-      d.setDate(d.getDate()+i);
-      const h = getHijri(d);
-      if (h.month === 9 && h.day === 1) return i;
-    }
-  } catch(e){ /* fall through */ }
+  for (let i=0; i<380; i++){
+    const d = new Date();
+    d.setDate(d.getDate()+i);
+    const h = getHijri(d);
+    if (h.month === 9 && h.day === 1) return i;
+  }
   return null;
 }
 
@@ -1231,6 +1267,20 @@ function previewAdhan(id){
 /* ============================================================
    8. RENDER — Qibla
 ============================================================ */
+function kaabaIconSVG(cx, cy, size){
+  const s = size, half = s/2;
+  // Simple, recognizable small-scale Kaaba glyph: a dark cube with the
+  // gold Hizam band near the top and a small door detail — the same
+  // simplified iconography used across most Islamic apps at this scale.
+  return `
+    <g transform="translate(${cx-half},${cy-half})">
+      <rect x="0.5" y="0.5" width="${s-1}" height="${s-1}" rx="${s*0.12}" fill="#161616" stroke="#E5C374" stroke-width="1"/>
+      <rect x="0.5" y="${s*0.34}" width="${s-1}" height="${s*0.18}" fill="#D4AF37"/>
+      <rect x="${s*0.43}" y="${s*0.58}" width="${s*0.14}" height="${s*0.4}" rx="1" fill="#8a6d2f"/>
+    </g>
+  `;
+}
+
 function drawCompass(headingDeg, bearingDeg){
   const svg = document.getElementById("compassDial");
   const cx=130, cy=130, r=112;
@@ -1245,10 +1295,9 @@ function drawCompass(headingDeg, bearingDeg){
   }
   const rel = ((bearingDeg - headingDeg) % 360 + 360) % 360;
   const na = (rel-90)*DEG;
+  const iconSize = 26;
   const tipX = cx + (r-26)*Math.cos(na), tipY = cy+(r-26)*Math.sin(na);
-  const baseA1 = na + 2.7, baseA2 = na - 2.7;
-  const b1x = cx + 14*Math.cos(baseA1), b1y = cy+14*Math.sin(baseA1);
-  const b2x = cx + 14*Math.cos(baseA2), b2y = cy+14*Math.sin(baseA2);
+  const shaftEndX = cx + (r-42)*Math.cos(na), shaftEndY = cy + (r-42)*Math.sin(na);
 
   svg.innerHTML = `
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="#15302A" stroke="#C9A24D" stroke-width="1.2" opacity="0.9"/>
@@ -1258,8 +1307,9 @@ function drawCompass(headingDeg, bearingDeg){
     <text x="${cx}" y="${cy+r-14}" text-anchor="middle" fill="#8FA39C" font-size="12" font-family="Inter">S</text>
     <text x="${cx-r+18}" y="${cy+4}" text-anchor="middle" fill="#8FA39C" font-size="12" font-family="Inter">W</text>
     <g>
-      <polygon points="${tipX},${tipY} ${b1x},${b1y} ${b2x},${b2y}" fill="#E5C374" />
-      <circle cx="${cx}" cy="${cy}" r="6" fill="#E5C374" stroke="#0E1F1B" stroke-width="1.5"/>
+      <line x1="${cx}" y1="${cy}" x2="${shaftEndX}" y2="${shaftEndY}" stroke="#E5C374" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="5" fill="#E5C374" stroke="#0E1F1B" stroke-width="1.5"/>
+      ${kaabaIconSVG(tipX, tipY, iconSize)}
     </g>
   `;
   // ornamental 8-point star etched faintly behind the needle
@@ -1893,13 +1943,9 @@ adhanSwitch.addEventListener("click", async ()=>{
    before you publish — it currently just points at a placeholder page
    so nothing is silently misdirecting real donations anywhere.
 ============================================================ */
-const DONATION_URL = "https://example.com/donate-to-mawaqit";
+const DONATION_URL = "https://paypal.me/Prayertimeandduaa";
 
 function openDonationLink(){
-  if (DONATION_URL.indexOf("example.com") !== -1){
-    showToast("Add your real donation link (PayPal.me, Ko-fi, etc.) in the code — search for DONATION_URL.", 5000);
-    return;
-  }
   window.open(DONATION_URL, "_blank", "noopener,noreferrer");
 }
 document.getElementById("donateBtn").addEventListener("click", openDonationLink);
