@@ -237,6 +237,11 @@
   .btn-ghost{
     background:none; border:1px solid var(--line); color: var(--parchment-dim);
   }
+  .donate-btn{
+    border-color: var(--danger);
+    background: linear-gradient(180deg, rgba(201,105,77,0.22), rgba(201,105,77,0.08));
+    color: #E8A48F;
+  }
 
   /* ===== Quran ===== */
   .quran-toolbar{ display:flex; gap:8px; margin-top:8px; }
@@ -547,6 +552,8 @@
 
       <div class="section-label">Du'as &amp; reminders</div>
       <div class="dua-list" id="duaList"></div>
+
+      <button class="btn donate-btn" id="donateBtnDua" style="width:100%; margin-top:18px;">❤ Support Mawaqit</button>
     </section>
   </main>
 
@@ -616,9 +623,13 @@
     <button data-val="24">24-hour</button>
   </div>
 
+  <h3>Support this project</h3>
+  <p class="field-label" style="margin-top:-4px;">If Mawaqit has been useful to you, consider supporting its upkeep — hosting, the Qur'an API, and ongoing work.</p>
+  <button class="btn donate-btn" id="donateBtn" style="width:100%; margin-top:0;">❤ Donate / Support Mawaqit</button>
+
   <h3 style="margin-bottom:4px;">About this preview</h3>
   <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:4px;">
-    Prayer times use standard astronomical formulas, adjust automatically for the high-latitude case (long summer nights), and can be fine-tuned by up to 3 hours per prayer above. Qur'an text, translations, and the reciter list are always pulled live from an open Qur'an API, so they stay accurate and keep growing. The adhan plays automatically at each prayer while this app is open, using the muezzin you pick above.
+    Prayer times use standard astronomical formulas, adjust automatically for the high-latitude case (long summer nights), and can be fine-tuned by up to 3 hours per prayer above. Qur'an text, translations, and the reciter list are always pulled live from an open Qur'an API, so they stay accurate and keep growing. The adhan plays automatically at each prayer while this app is open, using the muezzin you pick above. "Play full surah" automatically chains individual ayahs together for reciters that don't have a single combined recording.
   </p>
   <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
     Two honest limits: a browser tab can't reliably play full-length audio or fire notifications once it's fully closed — the native app build handles real background prayer alerts. And a true lock-screen/home-screen widget isn't possible for a web app at all; that would need the native app compiled with a platform-specific widget extension (see its README).
@@ -1269,18 +1280,51 @@ function updateQiblaStats(){
   drawCompass(lastHeading, bearing);
 }
 
-function handleOrientation(e){
+let compassDetectTimeout = null;
+let compassGotEvent = false;
+let compassActiveListener = null; // "absolute" | "relative" | null — only one is ever attached at a time
+
+function handleAbsoluteOrientation(e){
+  if (e.alpha === null) return;
+  compassGotEvent = true;
+  clearTimeout(compassDetectTimeout);
+  lastHeading = 360 - e.alpha; // deviceorientationabsolute: alpha is already true-north-relative
+  document.getElementById("qiblaStatus").textContent = "Rotate slowly until the gold arrow points up.";
+  updateQiblaStats();
+}
+
+function handleRelativeOrientation(e){
   let heading;
   if (typeof e.webkitCompassHeading === "number"){
-    heading = e.webkitCompassHeading; // iOS, already true-north relative
+    heading = e.webkitCompassHeading; // iOS: true-north-relative despite the "relative" event name
+  } else if (e.absolute === true && e.alpha !== null){
+    heading = 360 - e.alpha; // some browsers mark plain deviceorientation as absolute too
   } else if (e.alpha !== null){
-    heading = 360 - e.alpha; // best-effort for Android
+    // No true-north reference available — heading is only relative to wherever
+    // the device was pointed when tracking started. Still useful (it moves
+    // as you turn), but say so plainly rather than implying accuracy we
+    // don't have.
+    heading = 360 - e.alpha;
+    document.getElementById("qiblaStatus").textContent = "Approximate direction (this device doesn't report true north) — rotate in a figure-8 to calibrate, or use the bearing number below with a separate compass app.";
+    compassGotEvent = true;
+    clearTimeout(compassDetectTimeout);
+    lastHeading = heading;
+    updateQiblaStats();
+    return;
   } else {
     return;
   }
+  compassGotEvent = true;
+  clearTimeout(compassDetectTimeout);
   lastHeading = heading;
   document.getElementById("qiblaStatus").textContent = "Rotate slowly until the gold arrow points up.";
   updateQiblaStats();
+}
+
+function stopCompassListeners(){
+  window.removeEventListener("deviceorientationabsolute", handleAbsoluteOrientation, true);
+  window.removeEventListener("deviceorientation", handleRelativeOrientation, true);
+  compassActiveListener = null;
 }
 
 async function enableCompass(){
@@ -1300,14 +1344,42 @@ async function enableCompass(){
       return;
     }
   }
-  if (window.DeviceOrientationEvent){
-    window.addEventListener("deviceorientationabsolute", handleOrientation, true);
-    window.addEventListener("deviceorientation", handleOrientation, true);
-    state.orientationOn = true;
-    document.getElementById("qiblaStatus").textContent = "Hold your phone flat and rotate slowly. Move in a figure-8 first if it seems off.";
-  } else {
-    document.getElementById("qiblaStatus").textContent = "This device/browser doesn't expose compass data — use the bearing in degrees below with any compass app.";
+  if (!window.DeviceOrientationEvent){
+    document.getElementById("qiblaStatus").textContent = "This browser doesn't expose orientation data — use the bearing in degrees below with any compass app.";
+    updateQiblaStats();
+    return;
   }
+
+  document.getElementById("qiblaStatus").textContent = "Looking for a compass sensor…";
+  stopCompassListeners();
+  compassGotEvent = false;
+  state.orientationOn = true;
+
+  // Prefer the true-north-calibrated event where the browser supports it.
+  // Only fall back to plain 'deviceorientation' if 'deviceorientationabsolute'
+  // never actually fires — listening to both at once (the previous approach)
+  // let two different reference frames race the same handler, which is what
+  // made the needle jump around or point the wrong way on some Android
+  // browsers.
+  window.addEventListener("deviceorientationabsolute", handleAbsoluteOrientation, true);
+  compassActiveListener = "absolute";
+
+  clearTimeout(compassDetectTimeout);
+  compassDetectTimeout = setTimeout(()=>{
+    if (compassGotEvent) return; // absolute events are working, nothing to do
+    // no absolute event arrived — try the plain event instead
+    window.removeEventListener("deviceorientationabsolute", handleAbsoluteOrientation, true);
+    window.addEventListener("deviceorientation", handleRelativeOrientation, true);
+    compassActiveListener = "relative";
+    compassDetectTimeout = setTimeout(()=>{
+      if (compassGotEvent) return;
+      // still nothing — this device/browser isn't giving us orientation data at all
+      // (common on desktop browsers, which have no magnetometer)
+      stopCompassListeners();
+      document.getElementById("qiblaStatus").textContent = "No compass sensor detected on this device/browser — use the bearing in degrees below with a separate compass app.";
+    }, 2500);
+  }, 2000);
+
   updateQiblaStats();
 }
 
@@ -1436,6 +1508,7 @@ async function openSurah(number){
   currentSurahNumber = number;
   showQuranPane("reader");
   document.getElementById("ayahList").innerHTML = `<div class="empty-note">Loading verses…</div>`;
+  cancelSurahSequence();
   stopAudio();
 
   try{
@@ -1464,7 +1537,8 @@ async function openSurah(number){
     const playBtn = document.getElementById("playSurahBtn");
     playBtn.textContent = "▶ Play full surah";
     playBtn.onclick = ()=>{
-      if (state.currentAudio && playBtn.textContent.indexOf("Stop") !== -1){
+      if (playBtn.textContent.indexOf("Stop") !== -1){
+        cancelSurahSequence();
         stopAudio();
       } else {
         playSurahAudio(surah.number);
@@ -1539,6 +1613,7 @@ document.getElementById("toggleTranslationBtn").addEventListener("click", (e)=>{
 });
 
 document.getElementById("readerBackBtn").addEventListener("click", ()=>{
+  cancelSurahSequence();
   stopAudio();
   showQuranPane("list");
 });
@@ -1580,6 +1655,12 @@ function renderBookmarksPane(){
       renderBookmarksPane();
     });
   });
+}
+
+let surahSequenceToken = 0; // only incremented to explicitly cancel a chained "whole surah" playback
+
+function cancelSurahSequence(){
+  surahSequenceToken++;
 }
 
 function stopAudio(){
@@ -1640,6 +1721,7 @@ function playAudioWithFallback(urlForBitrate, opts){
 }
 
 function playAyahAudio(globalNumber, row){
+  cancelSurahSequence(); // a manual single-ayah tap should override any running "whole surah" chain
   playAudioWithFallback(
     (bitrate)=> `https://cdn.islamic.network/quran/audio/${bitrate}/${state.reciter}/${globalNumber}.mp3`,
     { rowEl: row, onFail: ()=> showToast("Couldn't play this ayah with the selected reciter — try a different reciter above.", 4500) }
@@ -1648,17 +1730,56 @@ function playAyahAudio(globalNumber, row){
 
 function playSurahAudio(number){
   const btn = document.getElementById("playSurahBtn");
+  cancelSurahSequence(); // invalidate any previous chained sequence before starting fresh
+  const myToken = surahSequenceToken;
   playAudioWithFallback(
     (bitrate)=> `https://cdn.islamic.network/quran/audio-surah/${bitrate}/${state.reciter}/${number}.mp3`,
     {
       onPlaying: ()=>{ if (btn) btn.textContent = "■ Stop"; },
-      onEnded: ()=>{ if (btn) btn.textContent = "▶ Play full surah"; },
+      onEnded: ()=>{ if (myToken === surahSequenceToken && btn) btn.textContent = "▶ Play full surah"; },
       onFail: ()=>{
-        if (btn) btn.textContent = "▶ Play full surah";
-        showToast("This reciter doesn't have a full-surah recording — try the ▶ button on individual ayahs instead.", 4500);
+        // This reciter has no dedicated full-surah file on the CDN for any
+        // bitrate — rather than just telling the person to tap each ayah
+        // manually, chain every ayah's audio back-to-back automatically so
+        // "Play full surah" still gives a continuous whole-surah listen for
+        // any reciter that has per-ayah recordings (the vast majority do).
+        if (myToken !== surahSequenceToken) return;
+        playSurahSequentially(myToken);
       }
     }
   );
+}
+
+function playSurahSequentially(token){
+  const btn = document.getElementById("playSurahBtn");
+  if (!currentAyahs.length){
+    if (btn) btn.textContent = "▶ Play full surah";
+    showToast("Couldn't play this surah with the selected reciter — try a different reciter above.", 4500);
+    return;
+  }
+  if (btn) btn.textContent = "■ Stop";
+  let i = 0;
+
+  function playNext(){
+    if (token !== surahSequenceToken) return; // stopped, or a newer request superseded this one
+    if (i >= currentAyahs.length){
+      if (btn) btn.textContent = "▶ Play full surah";
+      return;
+    }
+    const ayah = currentAyahs[i];
+    i++;
+    const row = document.querySelector(`.ayah-row[data-global="${ayah.globalNumber}"]`);
+    if (row && row.scrollIntoView) row.scrollIntoView({ behavior:"smooth", block:"center" });
+    playAudioWithFallback(
+      (bitrate)=> `https://cdn.islamic.network/quran/audio/${bitrate}/${state.reciter}/${ayah.globalNumber}.mp3`,
+      {
+        rowEl: row,
+        onEnded: ()=>{ if (token === surahSequenceToken) playNext(); },
+        onFail: ()=>{ if (token === surahSequenceToken) playNext(); } // skip an unplayable ayah rather than stopping the whole surah
+      }
+    );
+  }
+  playNext();
 }
 
 /* ============================================================
@@ -1764,6 +1885,25 @@ adhanSwitch.addEventListener("click", async ()=>{
   persistSettings();
   showToast(state.adhanEnabled ? "Adhan will play automatically at each prayer time." : "Automatic adhan turned off.");
 });
+
+/* ============================================================
+   10b. SUPPORT / DONATE
+   IMPORTANT: replace this placeholder with your own donation link
+   (PayPal.me, Ko-fi, BuyMeACoffee, a charity's own donation page, etc.)
+   before you publish — it currently just points at a placeholder page
+   so nothing is silently misdirecting real donations anywhere.
+============================================================ */
+const DONATION_URL = "https://example.com/donate-to-mawaqit";
+
+function openDonationLink(){
+  if (DONATION_URL.indexOf("example.com") !== -1){
+    showToast("Add your real donation link (PayPal.me, Ko-fi, etc.) in the code — search for DONATION_URL.", 5000);
+    return;
+  }
+  window.open(DONATION_URL, "_blank", "noopener,noreferrer");
+}
+document.getElementById("donateBtn").addEventListener("click", openDonationLink);
+document.getElementById("donateBtnDua").addEventListener("click", openDonationLink);
 
 /* ============================================================
    11. INSTALL PROMPT (Add to Home Screen)
