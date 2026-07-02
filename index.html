@@ -48,6 +48,14 @@
     font-family: var(--font-ui);
     -webkit-font-smoothing: antialiased;
     overflow-x:hidden;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='none' stroke='%23C9A24D' stroke-width='0.6'%3E%3Cpath d='M30 4 L34 24 L54 30 L34 36 L30 56 L26 36 L6 30 L26 24 Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 60px 60px;
+    opacity: 0.05;
   }
   button{font-family:inherit; color:inherit;}
   ::selection{ background: var(--gold); color:var(--ink); }
@@ -59,6 +67,7 @@
     margin: 0 auto;
     min-height: 100%;
     position: relative;
+    z-index: 1;
     padding-bottom: calc(78px + var(--safe-bottom));
     display:flex;
     flex-direction:column;
@@ -116,6 +125,7 @@
     border-radius: var(--radius);
     background: linear-gradient(165deg, var(--surface-2), var(--surface) 70%);
     border: 1px solid var(--line);
+    box-shadow: 0 20px 60px -30px rgba(0,0,0,0.6);
     padding: 30px 22px 26px;
     text-align:center;
     overflow:hidden;
@@ -174,6 +184,7 @@
   .prayer-row .ptime{ font-variant-numeric: tabular-nums; font-size:16px; font-weight:600; color: var(--parchment-dim);}
   .prayer-row.next .ptime{ color: var(--gold-bright); }
   .prayer-row.passed{ opacity:.55; }
+  .adj-badge{ display:inline-block; margin-left:6px; font-size:10px; font-weight:600; color:var(--turquoise); background:rgba(79,168,151,0.16); border-radius:6px; padding:2px 5px; vertical-align:middle; }
 
   /* ===== Bottom tabs ===== */
   .tabs{
@@ -239,7 +250,7 @@
     color: var(--parchment); font-size: 13px; padding: 0 10px; font-family: var(--font-ui);
   }
   .reciter-row{ margin-top:10px; display:flex; align-items:center; gap:8px; }
-  .reciter-row label{ font-size:12px; color:var(--muted); white-space:nowrap; }
+  .reciter-row label{ font-size:12px; color:var(--muted); white-space:nowrap; width:64px; flex-shrink:0; }
   .reciter-row select{ flex:1; height:38px; }
 
   .surah-list{ margin-top:14px; display:flex; flex-direction:column; gap:6px; }
@@ -257,7 +268,7 @@
   .surah-badge svg{ position:absolute; inset:0; }
   .surah-info{ flex:1; min-width:0; }
   .surah-name-en{ font-size:14.5px; font-weight:500; }
-  .surah-meta{ font-size:11.5px; color:var(--muted); margin-top:1px; }
+  .surah-meta{ font-size:11.5px; color:var(--muted); margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .surah-name-ar{ font-family: var(--font-arabic); font-size:18px; color: var(--parchment-dim); }
 
   /* Reader */
@@ -270,9 +281,10 @@
   .ayah-list{ display:flex; flex-direction:column; gap:14px; margin-top:10px; }
   .ayah-row{
     background: var(--surface); border:1px solid var(--line-soft); border-radius: var(--radius-sm);
-    padding: 16px; position:relative;
+    padding: 16px; position:relative; transition: opacity .15s;
   }
   .ayah-row.playing{ border-color: var(--gold); }
+  .ayah-row.loading-audio{ opacity:0.65; }
   .ayah-num{
     font-size:11px; color: var(--turquoise); font-weight:700; margin-bottom:8px; letter-spacing:.04em;
   }
@@ -287,6 +299,9 @@
     display:flex; align-items:center; justify-content:center; cursor:pointer; color: var(--parchment-dim);
   }
   .mini-btn.active{ background: var(--gold); color: var(--ink); border-color:var(--gold); }
+
+  .bookmark-row{ position:relative; }
+  .bookmark-remove{ flex-shrink:0; }
 
   /* ===== Du'a / dhikr ===== */
   .dhikr-card{
@@ -342,7 +357,7 @@
   .sheet-handle{ width:38px; height:4px; background:var(--line); border-radius:2px; margin: 0 auto 14px; }
   .sheet h3{ font-family:var(--font-display); font-size:18px; margin:18px 0 8px; color:var(--gold-bright); }
   .sheet h3:first-of-type{ margin-top:0; }
-  .field-label{ font-size:12px; color:var(--muted); margin: 12px 0 6px; }
+  .field-label{ font-size:12px; color:var(--muted); margin: 12px 0 6px; line-height:1.5; }
   .sheet select, .sheet .search-input{ width:100%; height:42px; }
   .seg{ display:flex; gap:6px; }
   .seg button{
@@ -353,6 +368,17 @@
   .loc-search-results{ margin-top:8px; display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto; }
   .loc-result{ padding:10px 12px; border-radius:10px; background:var(--surface); font-size:13px; cursor:pointer; }
   .loc-result:hover{ background:var(--surface-2); }
+
+  .adjust-list{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .adjust-row{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--line); border-radius: var(--radius-sm); padding:10px 12px; }
+  .adjust-name{ flex:1; font-size:13.5px; font-weight:500; }
+  .adjust-btn{ width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--parchment); font-size:16px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; user-select:none; touch-action:manipulation; }
+  .adjust-btn:active{ background:var(--surface-3); }
+  .adjust-val{ min-width:64px; text-align:center; font-variant-numeric: tabular-nums; font-size:12.5px; color:var(--gold-bright); font-weight:600; }
+
+  .adhan-row{ display:flex; gap:8px; margin-top:8px; }
+  .adhan-row select{ flex:1; height:42px; }
+  .adhan-preview-btn{ width:42px; height:42px; border-radius: var(--radius-sm); border:1px solid var(--line); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
 
   /* ===== Toast ===== */
   .toast{
@@ -450,10 +476,17 @@
       <div id="quranListPane">
         <div class="quran-toolbar">
           <input class="search-input" id="surahSearch" placeholder="Search a surah…" />
+          <button class="icon-btn" id="bookmarksToggleBtn" aria-label="Bookmarks">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+          </button>
         </div>
         <div class="reciter-row">
           <label>Reciter</label>
-          <select id="reciterSelect"></select>
+          <select id="reciterSelect"><option>Loading…</option></select>
+        </div>
+        <div class="reciter-row">
+          <label>Translation</label>
+          <select id="translationSelect"><option>Loading…</option></select>
         </div>
         <div class="surah-list" id="surahList"></div>
       </div>
@@ -474,6 +507,16 @@
         </div>
         <div class="ayah-list" id="ayahList"></div>
       </div>
+
+      <div id="quranBookmarksPane" style="display:none;">
+        <div class="reader-head">
+          <button class="icon-btn" id="bookmarksBackBtn" aria-label="Back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="reader-title"><div class="en">Bookmarks</div></div>
+        </div>
+        <div class="surah-list" id="bookmarksList" style="margin-top:14px;"></div>
+      </div>
     </section>
 
     <!-- ===== DUA VIEW ===== -->
@@ -492,6 +535,14 @@
           <div class="ni-sub" id="notifSub">Get a short du'a or reminder every few hours</div>
         </div>
         <div class="switch" id="notifSwitch"><div class="knob"></div></div>
+      </div>
+
+      <div class="notif-card">
+        <div class="ni-text">
+          <div class="ni-title">Adhan at prayer time</div>
+          <div class="ni-sub" id="adhanSub">Plays automatically while the app is open. Choose the muezzin in Settings.</div>
+        </div>
+        <div class="switch on" id="adhanSwitch"><div class="knob"></div></div>
       </div>
 
       <div class="section-label">Du'as &amp; reminders</div>
@@ -537,12 +588,26 @@
   <h3>Calculation method</h3>
   <select id="methodSelect" style="width:100%;"></select>
 
+  <h3>Fine-tune times</h3>
+  <p class="field-label" style="margin-top:-4px;">Nudge a prayer up to 3 hours earlier or later — handy for matching your local mosque.</p>
+  <div class="adjust-list" id="adjustList"></div>
+  <button class="dhikr-reset" id="resetAdjustBtn" style="margin-top:8px;">Reset all to calculated times</button>
+
   <h3>Asr school</h3>
   <div class="seg" id="asrSeg">
     <button data-val="1" class="active">Standard (Shafi'i / Maliki / Hanbali)</button>
   </div>
   <div class="seg" id="asrSeg2" style="margin-top:6px;">
     <button data-val="2">Hanafi</button>
+  </div>
+
+  <h3>Adhan</h3>
+  <p class="field-label" style="margin-top:-4px;">Choose which muezzin plays automatically at each prayer time.</p>
+  <div class="adhan-row">
+    <select id="adhanSelect"></select>
+    <button class="adhan-preview-btn" id="adhanPreviewBtn" aria-label="Preview adhan">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
   </div>
 
   <h3>Time format</h3>
@@ -553,7 +618,10 @@
 
   <h3 style="margin-bottom:4px;">About this preview</h3>
   <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:4px;">
-    Prayer times use standard astronomical formulas and adjust automatically for your location and the high-latitude case (long summer nights). Qur'an text and audio stream live from an open Qur'an API. Notifications work while this tab is open — for true background notifications, install the standalone app version.
+    Prayer times use standard astronomical formulas, adjust automatically for the high-latitude case (long summer nights), and can be fine-tuned by up to 3 hours per prayer above. Qur'an text, translations, and the reciter list are always pulled live from an open Qur'an API, so they stay accurate and keep growing. The adhan plays automatically at each prayer while this app is open, using the muezzin you pick above.
+  </p>
+  <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
+    Two honest limits: a browser tab can't reliably play full-length audio or fire notifications once it's fully closed — the native app build handles real background prayer alerts. And a true lock-screen/home-screen widget isn't possible for a web app at all; that would need the native app compiled with a platform-specific widget extension (see its README).
   </p>
   <button class="btn btn-ghost" id="closeSheetBtn" style="width:100%;">Close</button>
 </div>
@@ -686,6 +754,15 @@ function decimalHourToDate(baseDate, hourDecimal){
   return d;
 }
 
+// Applies a manual +/- minutes adjustment via real millisecond arithmetic
+// (not decimal-hour arithmetic) so it correctly rolls over a day boundary,
+// e.g. a high-latitude Isha at 23:42 plus a +60 min adjustment becomes
+// 00:42 the next calendar day rather than wrapping back to 00:42 today.
+function applyAdjustment(date, minutesOffset){
+  if (!date || !minutesOffset) return date;
+  return new Date(date.getTime() + minutesOffset*60000);
+}
+
 function fmtTime(date, use24){
   if (!date) return "—";
   let h = date.getHours(), m = date.getMinutes();
@@ -704,14 +781,57 @@ function getHijri(date){
     const fmt = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { day:"numeric", month:"long", year:"numeric" });
     const parts = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { day:"numeric", month:"numeric", year:"numeric" }).formatToParts(date);
     const monthNum = parseInt(parts.find(p=>p.type==="month").value, 10);
-    return { label: fmt.format(date), month: monthNum };
+    const dayNum = parseInt(parts.find(p=>p.type==="day").value, 10);
+    return { label: fmt.format(date), month: monthNum, day: dayNum };
   } catch(e){
-    return { label: "", month: null };
+    return { label: "", month: null, day: null };
   }
 }
 
+// Scans forward (bounded to ~380 days) to find how many days until the next
+// 1st of Ramadan. Returns null if the Hijri calendar API is unavailable.
+function daysUntilRamadan(){
+  try{
+    for (let i=0; i<380; i++){
+      const d = new Date();
+      d.setDate(d.getDate()+i);
+      const h = getHijri(d);
+      if (h.month === 9 && h.day === 1) return i;
+    }
+  } catch(e){ /* fall through */ }
+  return null;
+}
+
+let ramadanCountdownCache = { dateKey:null, days:null };
+function getDaysUntilRamadanCached(){
+  const key = new Date().toDateString();
+  if (ramadanCountdownCache.dateKey === key) return ramadanCountdownCache.days;
+  const days = daysUntilRamadan();
+  ramadanCountdownCache = { dateKey:key, days };
+  return days;
+}
+
 /* ============================================================
-   3. STATE
+   3. STORAGE — persists settings across visits.
+   Tries localStorage first; if that throws (e.g. a sandboxed
+   preview iframe), falls back to an in-memory store for the
+   current session so the app still works either way.
+============================================================ */
+const safeStorage = {
+  _mem: {},
+  get(key){
+    try{ return window.localStorage.getItem(key); }
+    catch(e){ return Object.prototype.hasOwnProperty.call(this._mem, key) ? this._mem[key] : null; }
+  },
+  set(key, val){
+    try{ window.localStorage.setItem(key, val); }
+    catch(e){ this._mem[key] = val; }
+  }
+};
+const STORAGE_KEY = "mawaqit:settings:v1";
+
+/* ============================================================
+   4. STATE
 ============================================================ */
 const state = {
   coords: null,
@@ -722,16 +842,49 @@ const state = {
   prayedToday: {},
   reciter: "ar.alafasy",
   reciters: [],
+  translationEdition: "en.sahih",
+  translations: [],
   surahs: [],
   showTranslation: true,
-  favoriteDuas: new Set(),
+  bookmarks: [],
   notifOn: false,
   notifTimer: null,
   dhikrCount: 0,
   currentAudio: null,
-  watchId: null,
   orientationOn: false,
+  adjustments: { fajr:0, dhuhr:0, asr:0, maghrib:0, isha:0 },
+  adhanId: "makkah",
+  adhanEnabled: true,
 };
+
+function persistSettings(){
+  const toSave = {
+    method: state.method,
+    asrFactor: state.asrFactor,
+    use24h: state.use24h,
+    reciter: state.reciter,
+    translationEdition: state.translationEdition,
+    adhanId: state.adhanId,
+    adhanEnabled: state.adhanEnabled,
+    adjustments: state.adjustments,
+    bookmarks: state.bookmarks,
+    coords: state.coords,
+    locationLabel: state.locationLabel,
+    notifOn: state.notifOn,
+  };
+  safeStorage.set(STORAGE_KEY, JSON.stringify(toSave));
+}
+
+function hydrateSettings(){
+  const raw = safeStorage.get(STORAGE_KEY);
+  if (!raw) return;
+  try{
+    const saved = JSON.parse(raw);
+    Object.assign(state, saved);
+    state.adjustments = Object.assign({ fajr:0, dhuhr:0, asr:0, maghrib:0, isha:0 }, saved.adjustments || {});
+    state.bookmarks = Array.isArray(saved.bookmarks) ? saved.bookmarks : [];
+  } catch(e){ /* corrupt/old data — ignore and keep defaults */ }
+}
 
 const PRAYER_DEFS = [
   { key:"fajr",    en:"Fajr",    ar:"الفجر" },
@@ -741,11 +894,11 @@ const PRAYER_DEFS = [
   { key:"maghrib", en:"Maghrib", ar:"المغرب" },
   { key:"isha",    en:"Isha",    ar:"العشاء" },
 ];
-// the five obligatory prayers (sunrise is shown but isn't "prayed")
+// the five obligatory prayers (sunrise is shown but isn't "prayed" or adjusted)
 const OBLIGATORY = ["fajr","dhuhr","asr","maghrib","isha"];
 
 /* ============================================================
-   4. CURATED CONTENT — du'as / dhikr / reminders (own wording)
+   5. CURATED CONTENT — du'as / dhikr / reminders (own wording)
    Short, well-known formulas; meanings paraphrased, not quoted
    from any single named translation.
 ============================================================ */
@@ -788,6 +941,9 @@ const DUAS = [
   { occasion:"Forgiveness", ar:"رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ",
     translit:"Rabbighfir li wa tub 'alayya innaka antat-Tawwabur-Raheem",
     meaning:"My Lord, forgive me and accept my repentance — You are the Ever-Returning, the Merciful." },
+  { occasion:"Breaking the fast", ar:"ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
+    translit:"Dhahaba al-zama'u wabtallat al-'urooqu wa thabata al-ajru inshaAllah",
+    meaning:"The thirst has gone, the veins are moist, and the reward is confirmed, if Allah wills." },
   { occasion:"Reminder", ar:"إِنَّ مَعَ الْعُسْرِ يُسْرًا", translit:"Inna ma'al-'usri yusra",
     meaning:"With hardship comes ease — a reminder that every difficulty is followed by relief." },
   { occasion:"Reminder", ar:"وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا", translit:"Wa man yattaqillaha yaj'al lahu makhraja",
@@ -802,19 +958,64 @@ const DHIKR_PHRASES = [
 ];
 let dhikrIndex = 0;
 
+// Only one reciter identifier is hand-typed here — everything else in the
+// dropdown is always pulled live from the API (see loadReciters below).
+// A previous version hand-typed several extra identifiers and got a few
+// of them subtly wrong (e.g. "ar.ahmedajamy" instead of the API's real
+// "ar.ajamy"), which silently 404'd on playback. Trusting the live list
+// as the source of truth for anything beyond this one seed fixes that
+// whole class of bug.
 const CURATED_RECITERS = [
   { id:"ar.alafasy", name:"Mishary Rashid Al-Afasy" },
-  { id:"ar.husary", name:"Mahmoud Khalil Al-Husary" },
-  { id:"ar.abdulbasitmurattal", name:"Abdul Basit (Murattal)" },
-  { id:"ar.minshawi", name:"Mohamed Siddiq Al-Minshawi" },
-  { id:"ar.shaatree", name:"Abu Bakr Al-Shatri" },
-  { id:"ar.muhammadayyoub", name:"Muhammad Ayyoub" },
-  { id:"ar.hudhaify", name:"Ali Al-Hudhaify" },
-  { id:"ar.ahmedajamy", name:"Ahmed Al-Ajamy" },
 ];
 
+// Same reasoning for translations: seed with a few identifiers confirmed
+// directly against Al Quran Cloud's own API documentation, then let the
+// live edition list fill in the rest (50+ languages).
+const CURATED_TRANSLATIONS = [
+  { id:"en.sahih", name:"Saheeh International (EN)" },
+  { id:"en.pickthall", name:"Pickthall (EN)" },
+  { id:"en.asad", name:"Muhammad Asad (EN)" },
+];
+
+// Adhan recordings — every filename below is confirmed directly against
+// the live listing at https://praytimes.org/docs/adhan (fetched and
+// checked one-by-one against this array, not guessed from a pattern).
+const ADHAN_OPTIONS = [
+  { id:"makkah",       group:"Sunni", name:"Makkah (Al-Haram)",   url:"https://praytimes.org/audio/sunni/Adhan-Makkah.mp3" },
+  { id:"madinah",      group:"Sunni", name:"Madinah (Al-Haram)",  url:"https://praytimes.org/audio/sunni/Adhan-Madinah.mp3" },
+  { id:"alaqsa",       group:"Sunni", name:"Al-Aqsa, Jerusalem",  url:"https://praytimes.org/audio/sunni/Adhan-Alaqsa.mp3" },
+  { id:"egypt",        group:"Sunni", name:"Egypt",               url:"https://praytimes.org/audio/sunni/Adhan-Egypt.mp3" },
+  { id:"halab",        group:"Sunni", name:"Halab (Aleppo)",      url:"https://praytimes.org/audio/sunni/Adhan-Halab.mp3" },
+  { id:"abdulbasit",   group:"Sunni", name:"Abdul Basit",         url:"https://praytimes.org/audio/sunni/Abdul-Basit.mp3" },
+  { id:"abdulghaffar", group:"Sunni", name:"Abdul Ghaffar",       url:"https://praytimes.org/audio/sunni/Abdul-Ghaffar.mp3" },
+  { id:"abdulhakam",   group:"Sunni", name:"Abdul Hakam",         url:"https://praytimes.org/audio/sunni/Abdul-Hakam.mp3" },
+  { id:"alhussaini",   group:"Sunni", name:"Al-Hussaini",         url:"https://praytimes.org/audio/sunni/Al-Hussaini.mp3" },
+  { id:"bakirbash",    group:"Sunni", name:"Bakir Bash",          url:"https://praytimes.org/audio/sunni/Bakir-Bash.mp3" },
+  { id:"hafez",        group:"Sunni", name:"Hafez",               url:"https://praytimes.org/audio/sunni/Hafez.mp3" },
+  { id:"hafizmurad",   group:"Sunni", name:"Hafiz Murad",         url:"https://praytimes.org/audio/sunni/Hafiz-Murad.mp3" },
+  { id:"minshawi",     group:"Sunni", name:"Minshawi",            url:"https://praytimes.org/audio/sunni/Minshawi.mp3" },
+  { id:"naghshbandi",  group:"Sunni", name:"Naghshbandi",         url:"https://praytimes.org/audio/sunni/Naghshbandi.mp3" },
+  { id:"saber",        group:"Sunni", name:"Saber",               url:"https://praytimes.org/audio/sunni/Saber.mp3" },
+  { id:"sharifdoman",  group:"Sunni", name:"Sharif Doman",        url:"https://praytimes.org/audio/sunni/Sharif-Doman.mp3" },
+  { id:"yusufislam",   group:"Sunni", name:"Yusuf Islam",         url:"https://praytimes.org/audio/sunni/Yusuf-Islam.mp3" },
+  { id:"shia-aghati",       group:"Shia", name:"Aghati",          url:"https://praytimes.org/audio/shia/Aghati.mp3" },
+  { id:"shia-ghalwash",     group:"Shia", name:"Ghalwash",        url:"https://praytimes.org/audio/shia/Ghalwash.mp3" },
+  { id:"shia-kazemzadeh",   group:"Shia", name:"Kazem Zadeh",     url:"https://praytimes.org/audio/shia/Kazem-Zadeh.mp3" },
+  { id:"shia-moazzenzadeh", group:"Shia", name:"Moazzen Zadeh",   url:"https://praytimes.org/audio/shia/Moazzen-Zadeh.mp3" },
+  { id:"shia-mohammadzadeh",group:"Shia", name:"Mohammad Zadeh",  url:"https://praytimes.org/audio/shia/Mohammad-Zadeh.mp3" },
+  { id:"shia-rezaeian",     group:"Shia", name:"Rezaeian",        url:"https://praytimes.org/audio/shia/Rezaeian.mp3" },
+  { id:"shia-rowhaninejad", group:"Shia", name:"Rowhani Nejad",   url:"https://praytimes.org/audio/shia/Rowhani-Nejad.mp3" },
+  { id:"shia-salimi",       group:"Shia", name:"Salimi",          url:"https://praytimes.org/audio/shia/Salimi.mp3" },
+  { id:"shia-sharif",       group:"Shia", name:"Sharif",          url:"https://praytimes.org/audio/shia/Sharif.mp3" },
+  { id:"shia-sobhdel",      group:"Shia", name:"Sobhdel",         url:"https://praytimes.org/audio/shia/Sobhdel.mp3" },
+  { id:"shia-tasviehchi",   group:"Shia", name:"Tasvieh-Chi",     url:"https://praytimes.org/audio/shia/Tasvieh-Chi.mp3" },
+  { id:"shia-tookhi",       group:"Shia", name:"Tookhi",          url:"https://praytimes.org/audio/shia/Tookhi.mp3" },
+];
+function findAdhan(id){ return ADHAN_OPTIONS.find(a=>a.id===id) || ADHAN_OPTIONS[0]; }
+
 /* ============================================================
-   5. ICONS / ORNAMENTS
+   6. ICONS / ORNAMENTS
 ============================================================ */
 function starSVG(opts){
   opts = opts || {};
@@ -826,13 +1027,12 @@ function starSVG(opts){
   </g>`;
 }
 
-function locIcon(){ return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-7.2-7-12a7 7 0 0 1 14 0c0 4.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>`; }
-
 /* ============================================================
-   6. RENDER — Prayer view
+   7. RENDER — Prayer view
 ============================================================ */
 let todaysTimes = null;
 let countdownTimer = null;
+let currentPrayerDates = {};
 
 function computeIsRamadan(){
   const h = getHijri(new Date());
@@ -863,7 +1063,11 @@ function renderPrayerList(now, ramadan){
 
   const order = ["fajr","sunrise","dhuhr","asr","maghrib","isha"];
   const dates = {};
-  order.forEach(k=>{ dates[k] = todaysTimes[k]!==null ? decimalHourToDate(now, todaysTimes[k]) : null; });
+  order.forEach(k=>{
+    const base = todaysTimes[k]!==null ? decimalHourToDate(now, todaysTimes[k]) : null;
+    dates[k] = base ? applyAdjustment(base, state.adjustments[k]||0) : null;
+  });
+  currentPrayerDates = dates;
 
   // find next prayer among obligatory + sunrise marker (for display order) using full timestamps
   let next = null, nextKey = null;
@@ -877,7 +1081,7 @@ function renderPrayerList(now, ramadan){
     const tz = -tom.getTimezoneOffset()/60;
     const t2 = computeTimes(state.coords.lat, state.coords.lng, tom.getFullYear(), tom.getMonth()+1, tom.getDate(), tz, state.method, state.asrFactor, ramadan);
     if (t2.fajr !== null){
-      next = decimalHourToDate(tom, t2.fajr);
+      next = applyAdjustment(decimalHourToDate(tom, t2.fajr), state.adjustments.fajr||0);
       nextKey = "fajr";
       usingTomorrowFajr = true;
     }
@@ -886,6 +1090,7 @@ function renderPrayerList(now, ramadan){
   list.innerHTML = "";
   PRAYER_DEFS.forEach(p=>{
     const d = dates[p.key];
+    const adj = state.adjustments[p.key] || 0;
     const row = document.createElement("div");
     row.className = "prayer-row" + (p.key===nextKey && !usingTomorrowFajr ? " next" : "") + (d && d.getTime()<now.getTime() ? " passed":"");
     const isObligatory = OBLIGATORY.includes(p.key);
@@ -897,7 +1102,7 @@ function renderPrayerList(now, ramadan){
         <div class="pname">${p.en}</div>
         <div class="pname-ar">${p.ar}</div>
       </div>
-      <div class="ptime">${d ? fmtTime(d, state.use24h) : "N/A"}</div>
+      <div class="ptime">${d ? fmtTime(d, state.use24h) : "N/A"}${adj ? `<span class="adj-badge">${adj>0?'+':''}${adj}m</span>` : ''}</div>
     `;
     list.appendChild(row);
   });
@@ -920,14 +1125,22 @@ function renderPrayerList(now, ramadan){
     startCountdown(next);
   }
 
-  // ramadan banner
+  // ramadan banner (or, outside Ramadan, a gentle countdown-to-Ramadan)
   const banner = document.getElementById("ramadanBanner");
   if (ramadan && dates.maghrib && dates.fajr){
     banner.style.display = "flex";
+    const h = getHijri(now);
     document.getElementById("ramadanText").textContent =
-      `Ramadan Mubarak — Suhoor ends ${fmtTime(dates.fajr, state.use24h)}, Iftar at ${fmtTime(dates.maghrib, state.use24h)}`;
+      `Ramadan Mubarak${h.day ? ` · Day ${h.day}` : ""} — Suhoor ends ${fmtTime(dates.fajr, state.use24h)}, Iftar at ${fmtTime(dates.maghrib, state.use24h)}`;
   } else {
-    banner.style.display = "none";
+    const daysAway = getDaysUntilRamadanCached();
+    if (daysAway !== null && daysAway > 0 && daysAway <= 30){
+      banner.style.display = "flex";
+      document.getElementById("ramadanText").textContent =
+        daysAway === 1 ? "Ramadan begins tomorrow, insha'Allah (estimated)" : `${daysAway} days until Ramadan, insha'Allah (estimated)`;
+    } else {
+      banner.style.display = "none";
+    }
   }
 
   if (todaysTimes.usedFallback){
@@ -953,7 +1166,59 @@ function startCountdown(target){
 }
 
 /* ============================================================
-   7. RENDER — Qibla
+   7b. ADHAN — plays automatically when a prayer time is reached
+============================================================ */
+const adhanFiredLog = new Set();
+
+function adhanTick(){
+  const now = new Date();
+  const dateKey = now.toDateString();
+  for (const k of Array.from(adhanFiredLog)){
+    if (!k.startsWith(dateKey)) adhanFiredLog.delete(k);
+  }
+  OBLIGATORY.forEach(key=>{
+    const d = currentPrayerDates[key];
+    if (!d) return;
+    const diffMs = now.getTime() - d.getTime();
+    const logKey = dateKey + "-" + key;
+    if (diffMs >= 0 && diffMs < 2000 && !adhanFiredLog.has(logKey)){
+      adhanFiredLog.add(logKey);
+      onPrayerTimeReached(key);
+    }
+  });
+}
+setInterval(adhanTick, 1000);
+
+function onPrayerTimeReached(key){
+  const def = PRAYER_DEFS.find(p=>p.key===key);
+  if (state.adhanEnabled){ playAdhan(); }
+  if ("Notification" in window && Notification.permission === "granted"){
+    try{ new Notification("Mawaqit — " + def.en, { body:`It's time for ${def.en} prayer.`, tag:"mawaqit-prayer-"+key }); }
+    catch(e){ showToast(`It's time for ${def.en} prayer.`, 6000); }
+  } else {
+    showToast(`It's time for ${def.en} prayer.`, 6000);
+  }
+}
+
+function playAdhan(){
+  const adhan = findAdhan(state.adhanId);
+  stopAudio();
+  const audio = new Audio(adhan.url);
+  state.currentAudio = audio;
+  audio.play().catch(()=>{ /* autoplay may be blocked without a recent tap; the notification/toast still fires */ });
+  audio.addEventListener("ended", ()=>{ if (state.currentAudio===audio) state.currentAudio=null; });
+}
+
+function previewAdhan(id){
+  const adhan = findAdhan(id);
+  stopAudio();
+  const audio = new Audio(adhan.url);
+  state.currentAudio = audio;
+  audio.play().catch(()=> showToast("Couldn't play the preview — check your connection."));
+}
+
+/* ============================================================
+   8. RENDER — Qibla
 ============================================================ */
 function drawCompass(headingDeg, bearingDeg){
   const svg = document.getElementById("compassDial");
@@ -1047,10 +1312,10 @@ async function enableCompass(){
 }
 
 /* ============================================================
-   8. QUR'AN — API integration (api.alquran.cloud)
+   9. QUR'AN — API integration (api.alquran.cloud)
 ============================================================ */
 const QURAN_API = "https://api.alquran.cloud/v1";
-const QURAN_CDN = "https://cdn.islamic.network/quran/audio-surah/128";
+const AUDIO_BITRATES = [128, 192, 64, 48];
 
 async function loadReciters(){
   const select = document.getElementById("reciterSelect");
@@ -1066,7 +1331,8 @@ async function loadReciters(){
       const seen = new Set(CURATED_RECITERS.map(r=>r.id));
       const extra = json.data
         .filter(e => e.language === "ar" && !seen.has(e.identifier))
-        .map(e => ({ id: e.identifier, name: e.englishName || e.identifier }));
+        .map(e => ({ id: e.identifier, name: e.englishName || e.identifier }))
+        .sort((a,b)=> a.name.localeCompare(b.name));
       state.reciters = CURATED_RECITERS.concat(extra);
       populate(state.reciters);
     } else {
@@ -1074,6 +1340,32 @@ async function loadReciters(){
     }
   } catch(e){
     state.reciters = CURATED_RECITERS; // offline fallback
+  }
+}
+
+async function loadTranslations(){
+  const select = document.getElementById("translationSelect");
+  function populate(list){
+    select.innerHTML = list.map(t=>`<option value="${t.id}">${t.name}</option>`).join("");
+    select.value = state.translationEdition;
+  }
+  populate(CURATED_TRANSLATIONS);
+  try{
+    const res = await fetch(QURAN_API + "/edition?format=text&type=translation");
+    const json = await res.json();
+    if (json && json.data){
+      const seen = new Set(CURATED_TRANSLATIONS.map(t=>t.id));
+      const extra = json.data
+        .filter(e => !seen.has(e.identifier))
+        .map(e => ({ id: e.identifier, name: `${e.name || e.englishName || e.identifier} (${(e.language||"").toUpperCase()})` }))
+        .sort((a,b)=> a.name.localeCompare(b.name));
+      state.translations = CURATED_TRANSLATIONS.concat(extra);
+      populate(state.translations);
+    } else {
+      state.translations = CURATED_TRANSLATIONS;
+    }
+  } catch(e){
+    state.translations = CURATED_TRANSLATIONS;
   }
 }
 
@@ -1121,46 +1413,92 @@ document.getElementById("surahSearch").addEventListener("input", (e)=>{
 
 document.getElementById("reciterSelect").addEventListener("change", (e)=>{
   state.reciter = e.target.value;
+  persistSettings();
 });
 
+document.getElementById("translationSelect").addEventListener("change", (e)=>{
+  state.translationEdition = e.target.value;
+  persistSettings();
+  if (currentSurahNumber) openSurah(currentSurahNumber);
+});
+
+function showQuranPane(which){
+  document.getElementById("quranListPane").style.display = which==="list" ? "block" : "none";
+  document.getElementById("quranReaderPane").style.display = which==="reader" ? "block" : "none";
+  document.getElementById("quranBookmarksPane").style.display = which==="bookmarks" ? "block" : "none";
+}
+
+let currentSurahNumber = null;
+let currentSurahMeta = null;
+let currentAyahs = [];
+
 async function openSurah(number){
-  document.getElementById("quranListPane").style.display = "none";
-  const readerPane = document.getElementById("quranReaderPane");
-  readerPane.style.display = "block";
+  currentSurahNumber = number;
+  showQuranPane("reader");
   document.getElementById("ayahList").innerHTML = `<div class="empty-note">Loading verses…</div>`;
   stopAudio();
 
   try{
     const [arRes, trRes] = await Promise.all([
       fetch(`${QURAN_API}/surah/${number}/quran-uthmani`),
-      fetch(`${QURAN_API}/surah/${number}/en.sahih`)
+      fetch(`${QURAN_API}/surah/${number}/${state.translationEdition}`)
     ]);
     const arJson = await arRes.json();
     const trJson = await trRes.json();
     const surah = arJson.data;
     const translation = trJson.data;
+    currentSurahMeta = surah;
 
     document.getElementById("readerTitleEn").textContent = `${surah.number}. ${surah.englishName}`;
     document.getElementById("readerTitleAr").textContent = surah.name;
 
-    const ayahs = surah.ayahs.map((a,i)=>({
+    currentAyahs = surah.ayahs.map((a,i)=>({
       number: a.numberInSurah,
       globalNumber: a.number,
       arabic: a.text,
-      translation: translation.ayahs[i] ? translation.ayahs[i].text : ""
+      translation: translation && translation.ayahs && translation.ayahs[i] ? translation.ayahs[i].text : ""
     }));
 
-    renderAyahs(ayahs, surah.number);
+    renderAyahs();
 
-    document.getElementById("playSurahBtn").onclick = ()=> playSurahAudio(surah.number);
+    const playBtn = document.getElementById("playSurahBtn");
+    playBtn.textContent = "▶ Play full surah";
+    playBtn.onclick = ()=>{
+      if (state.currentAudio && playBtn.textContent.indexOf("Stop") !== -1){
+        stopAudio();
+      } else {
+        playSurahAudio(surah.number);
+      }
+    };
   } catch(e){
     document.getElementById("ayahList").innerHTML = `<div class="empty-note">Couldn't load this surah right now. Check your connection and try again.</div>`;
   }
 }
 
-function renderAyahs(ayahs, surahNumber){
+function isBookmarked(globalNumber){
+  return state.bookmarks.some(b=>b.globalNumber===globalNumber);
+}
+
+function toggleBookmark(ayah, surah){
+  const idx = state.bookmarks.findIndex(b=>b.globalNumber===ayah.globalNumber);
+  if (idx >= 0){
+    state.bookmarks.splice(idx,1);
+  } else {
+    state.bookmarks.push({
+      globalNumber: ayah.globalNumber,
+      surahNumber: surah.number,
+      ayahNumber: ayah.number,
+      surahNameEn: surah.englishName,
+      surahNameAr: surah.name,
+      arabicSnippet: ayah.arabic.length > 70 ? ayah.arabic.slice(0,70) + "…" : ayah.arabic,
+    });
+  }
+  persistSettings();
+}
+
+function renderAyahs(){
   const el = document.getElementById("ayahList");
-  el.innerHTML = ayahs.map(a => `
+  el.innerHTML = currentAyahs.map(a => `
     <div class="ayah-row" data-global="${a.globalNumber}">
       <div class="ayah-num">Ayah ${a.number}</div>
       <div class="ayah-arabic">${a.arabic}</div>
@@ -1169,6 +1507,9 @@ function renderAyahs(ayahs, surahNumber){
         <button class="mini-btn ayah-play" aria-label="Play ayah">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         </button>
+        <button class="mini-btn ayah-bookmark ${isBookmarked(a.globalNumber)?'active':''}" aria-label="Bookmark ayah">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="${isBookmarked(a.globalNumber)?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+        </button>
       </div>
     </div>
   `).join("");
@@ -1176,6 +1517,15 @@ function renderAyahs(ayahs, surahNumber){
     btn.addEventListener("click", (e)=>{
       const row = e.target.closest(".ayah-row");
       playAyahAudio(parseInt(row.dataset.global,10), row);
+    });
+  });
+  el.querySelectorAll(".ayah-bookmark").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const row = e.target.closest(".ayah-row");
+      const g = parseInt(row.dataset.global,10);
+      const ayah = currentAyahs.find(a=>a.globalNumber===g);
+      if (ayah && currentSurahMeta) toggleBookmark(ayah, currentSurahMeta);
+      renderAyahs();
     });
   });
 }
@@ -1190,38 +1540,129 @@ document.getElementById("toggleTranslationBtn").addEventListener("click", (e)=>{
 
 document.getElementById("readerBackBtn").addEventListener("click", ()=>{
   stopAudio();
-  document.getElementById("quranReaderPane").style.display = "none";
-  document.getElementById("quranListPane").style.display = "block";
+  showQuranPane("list");
 });
+
+document.getElementById("bookmarksToggleBtn").addEventListener("click", ()=>{
+  renderBookmarksPane();
+  showQuranPane("bookmarks");
+});
+document.getElementById("bookmarksBackBtn").addEventListener("click", ()=> showQuranPane("list"));
+
+function renderBookmarksPane(){
+  const el = document.getElementById("bookmarksList");
+  if (!state.bookmarks.length){
+    el.innerHTML = `<div class="empty-note">No bookmarks yet. Open any surah and tap the star on an ayah to save it here.</div>`;
+    return;
+  }
+  el.innerHTML = state.bookmarks.map(b => `
+    <div class="surah-row bookmark-row" data-surah="${b.surahNumber}" data-global="${b.globalNumber}">
+      <div class="surah-badge"><svg viewBox="0 0 100 100">${starSVG({r:40,w:1.1})}</svg><span>${b.ayahNumber}</span></div>
+      <div class="surah-info">
+        <div class="surah-name-en">${b.surahNameEn} · Ayah ${b.ayahNumber}</div>
+        <div class="surah-meta">${b.arabicSnippet}</div>
+      </div>
+      <button class="mini-btn bookmark-remove" data-global="${b.globalNumber}" aria-label="Remove bookmark">✕</button>
+    </div>
+  `).join("");
+  el.querySelectorAll(".bookmark-row").forEach(row=>{
+    row.addEventListener("click", (e)=>{
+      if (e.target.closest(".bookmark-remove")) return;
+      openSurah(parseInt(row.dataset.surah,10));
+    });
+  });
+  el.querySelectorAll(".bookmark-remove").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      const g = parseInt(btn.dataset.global,10);
+      state.bookmarks = state.bookmarks.filter(b=>b.globalNumber!==g);
+      persistSettings();
+      renderBookmarksPane();
+    });
+  });
+}
 
 function stopAudio(){
   if (state.currentAudio){
-    state.currentAudio.pause();
+    try{ state.currentAudio.pause(); } catch(e){ /* no-op */ }
     state.currentAudio = null;
   }
-  document.querySelectorAll(".ayah-row.playing").forEach(r=>r.classList.remove("playing"));
+  document.querySelectorAll(".ayah-row.playing, .ayah-row.loading-audio").forEach(r=>r.classList.remove("playing","loading-audio"));
+  const psb = document.getElementById("playSurahBtn");
+  if (psb) psb.textContent = "▶ Play full surah";
+}
+
+// Robust playback: tries several bitrates in turn (some reciters only have
+// certain bitrates available), listens for real 'error' events rather than
+// only the play() promise, and times out a hung request after 6s so a
+// flaky response can't leave the button stuck on "loading" forever.
+function playAudioWithFallback(urlForBitrate, opts){
+  opts = opts || {};
+  stopAudio();
+  const audio = new Audio();
+  state.currentAudio = audio;
+  let idx = 0;
+  let settled = false;
+  let timeoutId = null;
+
+  function finishFail(){
+    if (opts.rowEl) opts.rowEl.classList.remove("playing","loading-audio");
+    if (state.currentAudio === audio) state.currentAudio = null;
+    opts.onFail && opts.onFail();
+  }
+  function attempt(){
+    if (audio !== state.currentAudio) return; // superseded by a newer playback request
+    if (idx >= AUDIO_BITRATES.length){ finishFail(); return; }
+    settled = false;
+    if (opts.rowEl) opts.rowEl.classList.add("loading-audio");
+    const url = urlForBitrate(AUDIO_BITRATES[idx]);
+    idx++;
+    audio.src = url;
+    audio.play().catch(()=>{ /* resolved via the error/canplay/timeout listeners below */ });
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(()=>{ if (!settled && audio===state.currentAudio){ settled = true; attempt(); } }, 6000);
+  }
+  audio.addEventListener("error", ()=>{
+    if (!settled && audio===state.currentAudio){ settled = true; clearTimeout(timeoutId); attempt(); }
+  });
+  audio.addEventListener("canplay", ()=>{
+    settled = true; clearTimeout(timeoutId);
+    if (opts.rowEl){ opts.rowEl.classList.remove("loading-audio"); opts.rowEl.classList.add("playing"); }
+    opts.onPlaying && opts.onPlaying();
+  });
+  audio.addEventListener("ended", ()=>{
+    if (opts.rowEl) opts.rowEl.classList.remove("playing");
+    if (state.currentAudio===audio) state.currentAudio=null;
+    opts.onEnded && opts.onEnded();
+  });
+  attempt();
+  return audio;
 }
 
 function playAyahAudio(globalNumber, row){
-  stopAudio();
-  const url = `https://cdn.islamic.network/quran/audio/128/${state.reciter}/${globalNumber}.mp3`;
-  const audio = new Audio(url);
-  state.currentAudio = audio;
-  row.classList.add("playing");
-  audio.play().catch(()=> showToast("Couldn't play audio for this reciter/ayah."));
-  audio.onended = ()=> row.classList.remove("playing");
+  playAudioWithFallback(
+    (bitrate)=> `https://cdn.islamic.network/quran/audio/${bitrate}/${state.reciter}/${globalNumber}.mp3`,
+    { rowEl: row, onFail: ()=> showToast("Couldn't play this ayah with the selected reciter — try a different reciter above.", 4500) }
+  );
 }
 
 function playSurahAudio(number){
-  stopAudio();
-  const url = `${QURAN_CDN}/${state.reciter}/${number}.mp3`;
-  const audio = new Audio(url);
-  state.currentAudio = audio;
-  audio.play().catch(()=> showToast("This reciter may not have a full-surah recording — try per-ayah playback instead."));
+  const btn = document.getElementById("playSurahBtn");
+  playAudioWithFallback(
+    (bitrate)=> `https://cdn.islamic.network/quran/audio-surah/${bitrate}/${state.reciter}/${number}.mp3`,
+    {
+      onPlaying: ()=>{ if (btn) btn.textContent = "■ Stop"; },
+      onEnded: ()=>{ if (btn) btn.textContent = "▶ Play full surah"; },
+      onFail: ()=>{
+        if (btn) btn.textContent = "▶ Play full surah";
+        showToast("This reciter doesn't have a full-surah recording — try the ▶ button on individual ayahs instead.", 4500);
+      }
+    }
+  );
 }
 
 /* ============================================================
-   9. DU'A / DHIKR / NOTIFICATIONS
+   10. DU'A / DHIKR / NOTIFICATIONS
 ============================================================ */
 function renderDuas(){
   const el = document.getElementById("duaList");
@@ -1278,6 +1719,12 @@ function fireReminder(){
 }
 
 const notifSwitch = document.getElementById("notifSwitch");
+function setNotifUI(on){
+  notifSwitch.classList.toggle("on", !!on);
+  document.getElementById("notifSub").textContent = on
+    ? "On — a du'a or reminder roughly every 3 hours while this is open"
+    : "Get a short du'a or reminder every few hours";
+}
 notifSwitch.addEventListener("click", async ()=>{
   if (!state.notifOn){
     let granted = true;
@@ -1288,22 +1735,38 @@ notifSwitch.addEventListener("click", async ()=>{
       } catch(e){ granted = false; }
     }
     state.notifOn = true;
-    notifSwitch.classList.add("on");
-    document.getElementById("notifSub").textContent = granted
-      ? "On — you'll get a reminder every 3 hours while this tab is open"
-      : "On (in-app only) — browser notifications need permission or aren't available in this preview";
+    setNotifUI(true);
+    if (!granted) document.getElementById("notifSub").textContent = "On (in-app only) — browser notifications need permission";
+    clearInterval(state.notifTimer);
     state.notifTimer = setInterval(fireReminder, 3*60*60*1000);
     showToast("Reminders are on. You'll see one roughly every 3 hours while this is open.");
   } else {
     state.notifOn = false;
-    notifSwitch.classList.remove("on");
-    document.getElementById("notifSub").textContent = "Get a short du'a or reminder every few hours";
+    setNotifUI(false);
     clearInterval(state.notifTimer);
   }
+  persistSettings();
+});
+
+const adhanSwitch = document.getElementById("adhanSwitch");
+function setAdhanUI(on){
+  adhanSwitch.classList.toggle("on", !!on);
+  document.getElementById("adhanSub").textContent = on
+    ? "Plays automatically while the app is open. Choose the muezzin in Settings."
+    : "Off — you'll still get a notification/toast when a prayer time arrives.";
+}
+adhanSwitch.addEventListener("click", async ()=>{
+  state.adhanEnabled = !state.adhanEnabled;
+  setAdhanUI(state.adhanEnabled);
+  if (state.adhanEnabled && "Notification" in window && Notification.permission === "default"){
+    try{ await Notification.requestPermission(); } catch(e){ /* ignore */ }
+  }
+  persistSettings();
+  showToast(state.adhanEnabled ? "Adhan will play automatically at each prayer time." : "Automatic adhan turned off.");
 });
 
 /* ============================================================
-   10b. INSTALL PROMPT (Add to Home Screen)
+   11. INSTALL PROMPT (Add to Home Screen)
 ============================================================ */
 let deferredInstallPrompt = null;
 window.addEventListener("beforeinstallprompt", (e)=>{
@@ -1313,7 +1776,7 @@ window.addEventListener("beforeinstallprompt", (e)=>{
 });
 
 /* ============================================================
-   10c. SERVICE WORKER — offline shell + install support
+   12. SERVICE WORKER — offline shell + install support
 ============================================================ */
 if ("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{
@@ -1321,9 +1784,8 @@ if ("serviceWorker" in navigator){
   });
 }
 
-
 /* ============================================================
-   10. LOCATION
+   13. LOCATION
 ============================================================ */
 async function reverseGeocode(lat, lng){
   try{
@@ -1353,6 +1815,7 @@ function setLocation(lat, lng, label){
   document.getElementById("locLabel").textContent = label;
   refreshPrayerTimes();
   updateQiblaStats();
+  persistSettings();
 }
 
 async function useDeviceLocation(){
@@ -1376,7 +1839,7 @@ async function useDeviceLocation(){
 }
 
 /* ============================================================
-   11. UI WIRING — tabs, settings sheet, init
+   14. UI WIRING — tabs, settings sheet, adjustments, adhan picker, init
 ============================================================ */
 function setLoading(on, text){
   const scr = document.getElementById("loadingScreen");
@@ -1444,7 +1907,7 @@ document.getElementById("citySearchInput").addEventListener("input", (e)=>{
 const methodSelect = document.getElementById("methodSelect");
 methodSelect.innerHTML = Object.entries(METHODS).map(([k,m])=>`<option value="${k}">${m.name}</option>`).join("");
 methodSelect.value = state.method;
-methodSelect.addEventListener("change", (e)=>{ state.method = e.target.value; refreshPrayerTimes(); });
+methodSelect.addEventListener("change", (e)=>{ state.method = e.target.value; refreshPrayerTimes(); persistSettings(); });
 
 document.querySelectorAll("#asrSeg button, #asrSeg2 button").forEach(btn=>{
   btn.addEventListener("click", ()=>{
@@ -1452,6 +1915,7 @@ document.querySelectorAll("#asrSeg button, #asrSeg2 button").forEach(btn=>{
     btn.classList.add("active");
     state.asrFactor = parseInt(btn.dataset.val,10);
     refreshPrayerTimes();
+    persistSettings();
   });
 });
 
@@ -1461,10 +1925,75 @@ document.querySelectorAll("#timeSeg button").forEach(btn=>{
     btn.classList.add("active");
     state.use24h = btn.dataset.val === "24";
     refreshPrayerTimes();
+    persistSettings();
   });
 });
 
 document.getElementById("qiblaEnableBtn").addEventListener("click", enableCompass);
+
+function renderAdjustList(){
+  const el = document.getElementById("adjustList");
+  el.innerHTML = OBLIGATORY.map(key=>{
+    const def = PRAYER_DEFS.find(p=>p.key===key);
+    const val = state.adjustments[key] || 0;
+    return `<div class="adjust-row" data-key="${key}">
+      <span class="adjust-name">${def.en}</span>
+      <button class="adjust-btn" data-dir="-1" aria-label="Decrease ${def.en} by 1 minute">−</button>
+      <span class="adjust-val">${val>0?'+':''}${val} min</span>
+      <button class="adjust-btn" data-dir="1" aria-label="Increase ${def.en} by 1 minute">+</button>
+    </div>`;
+  }).join("");
+
+  el.querySelectorAll(".adjust-btn").forEach(btn=>{
+    let holdTimer = null, holdInterval = null;
+    const row = btn.closest(".adjust-row");
+    const key = row.dataset.key;
+    const dir = parseInt(btn.dataset.dir,10);
+    function step(){
+      const cur = state.adjustments[key] || 0;
+      const next = Math.max(-180, Math.min(180, cur + dir));
+      state.adjustments[key] = next;
+      row.querySelector(".adjust-val").textContent = (next>0?'+':'') + next + " min";
+      refreshPrayerTimes();
+      persistSettings();
+    }
+    btn.addEventListener("pointerdown", (e)=>{
+      e.preventDefault();
+      step();
+      clearTimeout(holdTimer); clearInterval(holdInterval);
+      holdTimer = setTimeout(()=>{ holdInterval = setInterval(step, 90); }, 500);
+    });
+    ["pointerup","pointerleave","pointercancel"].forEach(ev=>{
+      btn.addEventListener(ev, ()=>{ clearTimeout(holdTimer); clearInterval(holdInterval); });
+    });
+  });
+}
+
+document.getElementById("resetAdjustBtn").addEventListener("click", ()=>{
+  OBLIGATORY.forEach(k=> state.adjustments[k]=0);
+  renderAdjustList();
+  refreshPrayerTimes();
+  persistSettings();
+  showToast("All prayer times reset to calculated values.");
+});
+
+function populateAdhanSelect(){
+  const select = document.getElementById("adhanSelect");
+  const groups = {};
+  ADHAN_OPTIONS.forEach(a=>{ (groups[a.group] = groups[a.group] || []).push(a); });
+  select.innerHTML = Object.entries(groups).map(([g, items])=>
+    `<optgroup label="${g}">${items.map(a=>`<option value="${a.id}">${a.name}</option>`).join("")}</optgroup>`
+  ).join("");
+  select.value = state.adhanId;
+}
+
+document.getElementById("adhanSelect").addEventListener("change", (e)=>{
+  state.adhanId = e.target.value;
+  persistSettings();
+});
+document.getElementById("adhanPreviewBtn").addEventListener("click", ()=>{
+  previewAdhan(document.getElementById("adhanSelect").value);
+});
 
 function renderHijri(){
   const h = getHijri(new Date());
@@ -1473,15 +2002,38 @@ function renderHijri(){
 }
 
 /* ============================================================
-   12. INIT
+   15. INIT
 ============================================================ */
 async function init(){
+  hydrateSettings();
+
   renderHijri();
   renderDuas();
+  renderAdjustList();
+  populateAdhanSelect();
+  setNotifUI(!!state.notifOn);
+  setAdhanUI(state.adhanEnabled !== false);
+  if (state.notifOn){ state.notifTimer = setInterval(fireReminder, 3*60*60*1000); }
+
+  // sync static settings controls to any hydrated values
+  document.querySelectorAll("#asrSeg button, #asrSeg2 button").forEach(b=>{
+    b.classList.toggle("active", parseInt(b.dataset.val,10) === state.asrFactor);
+  });
+  document.querySelectorAll("#timeSeg button").forEach(b=>{
+    b.classList.toggle("active", (b.dataset.val === "24") === state.use24h);
+  });
+
   await loadReciters();
+  await loadTranslations();
   loadSurahList();
 
-  if (navigator.geolocation){
+  if (state.coords){
+    // returning visit — we already know where the person is
+    document.getElementById("locLabel").textContent = state.locationLabel || "Set your location";
+    refreshPrayerTimes();
+    updateQiblaStats();
+    setLoading(false);
+  } else if (navigator.geolocation){
     navigator.geolocation.getCurrentPosition(async (pos)=>{
       const { latitude, longitude } = pos.coords;
       const label = await reverseGeocode(latitude, longitude);
