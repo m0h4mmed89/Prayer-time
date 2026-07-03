@@ -94,6 +94,8 @@
   .loc-row b{ color: var(--parchment-dim); font-weight:500; }
   .hijri-row{ margin-top: 3px; font-size: 12px; color: var(--muted); }
 
+  .topbar-actions{ display:flex; gap:8px; flex-shrink:0; }
+
   .icon-btn{
     width:40px; height:40px; border-radius: 12px;
     border: 1px solid var(--line);
@@ -149,6 +151,7 @@
     font-size: 40px; font-weight:700; letter-spacing: 0.02em; color: var(--parchment);
   }
   .hero-sub{ margin-top:8px; font-size:12.5px; color: var(--muted); }
+  .hero-greeting{ font-size:12px; color: var(--parchment-dim); margin-bottom:10px; opacity:0.85; }
 
   .ramadan-banner{
     margin-top: 14px; padding: 12px 16px; border-radius: var(--radius-sm);
@@ -157,6 +160,34 @@
     font-size: 13px; display:flex; align-items:center; gap:10px;
     color: var(--parchment-dim);
   }
+
+  .streak-card{
+    margin-top:12px; padding:13px 16px; border-radius: var(--radius-sm);
+    background: var(--surface); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .streak-left{ display:flex; align-items:center; gap:10px; }
+  .streak-flame{ font-size:22px; line-height:1; }
+  .streak-count{ font-size:20px; font-weight:700; color:var(--gold-bright); line-height:1; font-variant-numeric: tabular-nums; }
+  .streak-label{ font-size:10px; color:var(--muted); letter-spacing:.05em; text-transform:uppercase; margin-top:3px; }
+  .streak-week{ display:flex; gap:5px; }
+  .streak-day{
+    width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:9px; font-weight:700; border:1.5px solid var(--line); color:var(--muted); background:transparent;
+  }
+  .streak-day.complete{ background:var(--turquoise); border-color:var(--turquoise); color:var(--ink); }
+  .streak-day.partial{ background:rgba(79,168,151,0.32); border-color:var(--turquoise); color:var(--parchment); }
+  .streak-day.today{ border-color:var(--gold); }
+
+  .verse-card{
+    margin-top:22px; padding:18px; border-radius: var(--radius); background: linear-gradient(165deg, var(--surface-2), var(--surface));
+    border:1px solid var(--line);
+  }
+  .verse-head{ display:flex; align-items:center; justify-content:space-between; }
+  .verse-label{ font-size:11px; letter-spacing:.12em; color:var(--turquoise); font-weight:600; }
+  .verse-arabic{ font-family:var(--font-arabic); font-size:21px; line-height:1.9; text-align:right; direction:rtl; color:var(--parchment); margin-top:12px; }
+  .verse-translation{ font-size:13px; color:var(--parchment-dim); line-height:1.6; margin-top:10px; }
+  .verse-ref{ font-size:11px; color:var(--muted); margin-top:10px; letter-spacing:.03em; }
 
   /* ===== Prayer list ===== */
   .section-label{
@@ -283,6 +314,13 @@
   .reader-title .ar{ font-family:var(--font-arabic); font-size:16px; color:var(--muted); }
   .reader-actions{ display:flex; gap:8px; margin: 14px 0; }
   .reader-actions .btn, .reader-actions .btn-ghost{ margin-top:0; flex:1; text-align:center; font-size:13px; padding:11px; }
+  .font-size-row{ display:flex; align-items:center; gap:8px; margin-top:12px; }
+  .font-size-label{ font-size:11.5px; color:var(--muted); margin-right:2px; }
+  .font-size-btn{ width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--parchment-dim); cursor:pointer; }
+  .font-size-btn[data-size="small"]{ font-size:11px; }
+  .font-size-btn[data-size="medium"]{ font-size:14px; }
+  .font-size-btn[data-size="large"]{ font-size:17px; }
+  .font-size-btn.active{ background:var(--surface-3); border-color:var(--gold); color:var(--gold-bright); }
   .ayah-list{ display:flex; flex-direction:column; gap:14px; margin-top:10px; }
   .ayah-row{
     background: var(--surface); border:1px solid var(--line-soft); border-radius: var(--radius-sm);
@@ -344,6 +382,21 @@
   .dua-arabic{ font-family:var(--font-arabic); font-size:21px; text-align:right; direction:rtl; margin-top:8px; line-height:1.9; }
   .dua-translit{ font-size:12.5px; font-style:italic; color:var(--muted); margin-top:8px; }
   .dua-meaning{ font-size:13px; color:var(--parchment-dim); margin-top:6px; line-height:1.5; }
+
+  .names-entry-card{
+    margin-top:14px; width:100%; text-align:left; padding:16px; border-radius: var(--radius-sm);
+    background: linear-gradient(120deg, rgba(201,162,77,0.14), rgba(79,168,151,0.08));
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; color:var(--parchment); font-family:inherit;
+  }
+  .names-entry-title{ font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--gold-bright); }
+  .names-entry-sub{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .names-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+  .name-card{ background:var(--surface); border:1px solid var(--line-soft); border-radius: var(--radius-sm); padding:12px; text-align:center; }
+  .name-card .num{ font-size:10px; color:var(--turquoise); font-weight:700; }
+  .name-card .ar{ font-family:var(--font-arabic); font-size:19px; color:var(--gold-bright); margin-top:4px; }
+  .name-card .translit{ font-size:11.5px; color:var(--parchment-dim); margin-top:4px; font-weight:600; }
+  .name-card .meaning{ font-size:10.5px; color:var(--muted); margin-top:3px; line-height:1.4; }
 
   /* ===== Settings sheet ===== */
   .sheet-backdrop{
@@ -432,9 +485,14 @@
       </button>
       <div class="hijri-row" id="hijriRow">—</div>
     </div>
-    <button class="icon-btn" id="settingsBtn" aria-label="Settings">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a8 8 0 0 0-1.7-1L15 3h-4l-.3 2.9a8 8 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.97 7.97 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a8 8 0 0 0 1.7 1L11 21h4l.3-2.9a8 8 0 0 0 1.7-1l2.5 1 2-3.5L19.4 13z"/></svg>
-    </button>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="shareBtn" aria-label="Share prayer times">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a8 8 0 0 0-1.7-1L15 3h-4l-.3 2.9a8 8 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.97 7.97 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a8 8 0 0 0 1.7 1L11 21h4l.3-2.9a8 8 0 0 0 1.7-1l2.5 1 2-3.5L19.4 13z"/></svg>
+      </button>
+    </div>
   </div>
 
   <main>
@@ -445,11 +503,23 @@
         <svg class="corner tr" viewBox="0 0 40 40"><g fill="none" stroke="#C9A24D" stroke-width="1.4"><path d="M2 14 V2 H14"/></g></svg>
         <svg class="corner bl" viewBox="0 0 40 40"><g fill="none" stroke="#C9A24D" stroke-width="1.4"><path d="M2 14 V2 H14"/></g></svg>
         <svg class="corner br" viewBox="0 0 40 40"><g fill="none" stroke="#C9A24D" stroke-width="1.4"><path d="M2 14 V2 H14"/></g></svg>
+        <div class="hero-greeting" id="heroGreeting">Assalamu Alaikum</div>
         <div class="hero-eyebrow" id="heroEyebrow">Next prayer</div>
         <div class="hero-name" id="heroName">—</div>
         <div class="hero-name-ar" id="heroNameAr">—</div>
         <div class="hero-countdown" id="heroCountdown">--:--:--</div>
         <div class="hero-sub" id="heroSub">&nbsp;</div>
+      </div>
+
+      <div class="streak-card" id="streakCard">
+        <div class="streak-left">
+          <div class="streak-flame">🔥</div>
+          <div>
+            <div class="streak-count" id="streakCount">0</div>
+            <div class="streak-label">day streak</div>
+          </div>
+        </div>
+        <div class="streak-week" id="streakWeek"></div>
       </div>
 
       <div class="ramadan-banner" id="ramadanBanner" style="display:none;">
@@ -459,6 +529,18 @@
 
       <div class="section-label">Today</div>
       <div class="prayer-list" id="prayerList"></div>
+
+      <div class="verse-card" id="verseCard" style="display:none;">
+        <div class="verse-head">
+          <span class="verse-label">✦ VERSE OF THE DAY</span>
+          <button class="mini-btn" id="versePlayBtn" aria-label="Play verse audio">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+        <div class="verse-arabic" id="verseArabic">…</div>
+        <div class="verse-translation" id="verseTranslation"></div>
+        <div class="verse-ref" id="verseRef"></div>
+      </div>
     </section>
 
     <!-- ===== QIBLA VIEW ===== -->
@@ -511,6 +593,12 @@
           <button class="btn" id="playSurahBtn" style="margin-top:0;">▶ Play full surah</button>
           <button class="btn-ghost btn" id="toggleTranslationBtn">Translation: On</button>
         </div>
+        <div class="font-size-row">
+          <span class="font-size-label">Text size</span>
+          <button class="font-size-btn" data-size="small" aria-label="Small text">A</button>
+          <button class="font-size-btn" data-size="medium" aria-label="Medium text">A</button>
+          <button class="font-size-btn" data-size="large" aria-label="Large text">A</button>
+        </div>
         <div class="ayah-list" id="ayahList"></div>
       </div>
 
@@ -527,34 +615,57 @@
 
     <!-- ===== DUA VIEW ===== -->
     <section class="view" id="view-dua">
-      <div class="section-label">Dhikr counter</div>
-      <div class="dhikr-card">
-        <div class="dhikr-count" id="dhikrCount">0</div>
-        <div class="dhikr-label" id="dhikrPhraseLabel">SubḥānAllāh</div>
-        <button class="dhikr-tap" id="dhikrTap">سُبْحَانَ الله</button>
-        <button class="dhikr-reset" id="dhikrReset">Reset count</button>
-      </div>
-
-      <div class="notif-card">
-        <div class="ni-text">
-          <div class="ni-title">Du'a &amp; reminder notifications</div>
-          <div class="ni-sub" id="notifSub">Get a short du'a or reminder every few hours</div>
+      <div id="duaMainPane">
+        <div class="section-label">Dhikr counter</div>
+        <div class="dhikr-card">
+          <div class="dhikr-count" id="dhikrCount">0</div>
+          <div class="dhikr-label" id="dhikrPhraseLabel">SubḥānAllāh</div>
+          <button class="dhikr-tap" id="dhikrTap">سُبْحَانَ الله</button>
+          <button class="dhikr-reset" id="dhikrReset">Reset count</button>
         </div>
-        <div class="switch" id="notifSwitch"><div class="knob"></div></div>
-      </div>
 
-      <div class="notif-card">
-        <div class="ni-text">
-          <div class="ni-title">Adhan at prayer time</div>
-          <div class="ni-sub" id="adhanSub">Plays automatically while the app is open. Choose the muezzin in Settings.</div>
+        <button class="names-entry-card" id="namesEntryBtn">
+          <div>
+            <div class="names-entry-title">99 Names of Allah</div>
+            <div class="names-entry-sub">Asma-ul-Husna, with meanings</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
+        <div class="notif-card">
+          <div class="ni-text">
+            <div class="ni-title">Du'a &amp; reminder notifications</div>
+            <div class="ni-sub" id="notifSub">Get a short du'a or reminder every few hours</div>
+          </div>
+          <div class="switch" id="notifSwitch"><div class="knob"></div></div>
         </div>
-        <div class="switch on" id="adhanSwitch"><div class="knob"></div></div>
+
+        <div class="notif-card">
+          <div class="ni-text">
+            <div class="ni-title">Adhan at prayer time</div>
+            <div class="ni-sub" id="adhanSub">Plays automatically while the app is open. Choose the muezzin in Settings.</div>
+          </div>
+          <div class="switch on" id="adhanSwitch"><div class="knob"></div></div>
+        </div>
+
+        <div class="section-label">Du'as &amp; reminders</div>
+        <div class="dua-list" id="duaList"></div>
+
+        <button class="btn donate-btn" id="donateBtnDua" style="width:100%; margin-top:18px;">❤ Support Mawaqit</button>
       </div>
 
-      <div class="section-label">Du'as &amp; reminders</div>
-      <div class="dua-list" id="duaList"></div>
-
-      <button class="btn donate-btn" id="donateBtnDua" style="width:100%; margin-top:18px;">❤ Support Mawaqit</button>
+      <div id="namesPane" style="display:none;">
+        <div class="reader-head">
+          <button class="icon-btn" id="namesBackBtn" aria-label="Back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="reader-title">
+            <div class="en">99 Names of Allah</div>
+            <div class="ar">أسماء الله الحسنى</div>
+          </div>
+        </div>
+        <div class="names-grid" id="namesGrid" style="margin-top:14px;"></div>
+      </div>
     </section>
   </main>
 
@@ -898,7 +1009,7 @@ const state = {
   method: "mwl",
   asrFactor: 1,
   use24h: false,
-  prayedToday: {},
+  prayerHistory: {}, // { "YYYY-MM-DD": {fajr,dhuhr,asr,maghrib,isha: bool} }
   reciter: "ar.alafasy",
   reciters: [],
   translationEdition: "en.sahih",
@@ -915,6 +1026,7 @@ const state = {
   adhanId: "makkah",
   adhanEnabled: true,
   hijriOffsetDays: 0,
+  quranFontSize: "medium",
 };
 
 function persistSettings(){
@@ -932,6 +1044,8 @@ function persistSettings(){
     locationLabel: state.locationLabel,
     notifOn: state.notifOn,
     hijriOffsetDays: state.hijriOffsetDays,
+    prayerHistory: state.prayerHistory,
+    quranFontSize: state.quranFontSize,
   };
   safeStorage.set(STORAGE_KEY, JSON.stringify(toSave));
 }
@@ -945,7 +1059,71 @@ function hydrateSettings(){
     state.adjustments = Object.assign({ fajr:0, dhuhr:0, asr:0, maghrib:0, isha:0 }, saved.adjustments || {});
     state.bookmarks = Array.isArray(saved.bookmarks) ? saved.bookmarks : [];
     state.hijriOffsetDays = Number.isFinite(saved.hijriOffsetDays) ? saved.hijriOffsetDays : 0;
+    state.prayerHistory = (saved.prayerHistory && typeof saved.prayerHistory === "object") ? saved.prayerHistory : {};
+    state.quranFontSize = saved.quranFontSize || "medium";
   } catch(e){ /* corrupt/old data — ignore and keep defaults */ }
+}
+
+function todayKey(d){
+  const date = d || new Date();
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+}
+
+function getPrayedFor(dateKey){
+  return state.prayerHistory[dateKey] || {};
+}
+
+function togglePrayedFor(dateKey, prayerKey){
+  const day = Object.assign({}, state.prayerHistory[dateKey]);
+  day[prayerKey] = !day[prayerKey];
+  state.prayerHistory[dateKey] = day;
+  pruneHistory();
+}
+
+// Keep only the most recent ~60 days so persisted storage doesn't grow forever.
+function pruneHistory(){
+  const keys = Object.keys(state.prayerHistory).sort();
+  if (keys.length > 60){
+    keys.slice(0, keys.length - 60).forEach(k => delete state.prayerHistory[k]);
+  }
+}
+
+function isDayComplete(dayRecord){
+  return OBLIGATORY.every(k => dayRecord[k]);
+}
+
+// Current streak of consecutive fully-completed days, counting back from
+// today. If today isn't finished yet, that's expected (the day isn't over)
+// so the streak counts back from yesterday instead in that case.
+function computeStreak(){
+  const now = new Date();
+  let streak = 0;
+  let cursor = new Date(now);
+  const todayRecord = getPrayedFor(todayKey(cursor));
+  if (!isDayComplete(todayRecord)) cursor.setDate(cursor.getDate() - 1);
+  while (true){
+    const rec = getPrayedFor(todayKey(cursor));
+    if (!isDayComplete(rec)) break;
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+    if (streak > 365) break; // safety bound
+  }
+  return streak;
+}
+
+// Last 7 days (oldest to newest) as {dateKey, completedCount, isToday, dow}
+function getWeekHistory(){
+  const days = [];
+  const now = new Date();
+  for (let i=6; i>=0; i--){
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = todayKey(d);
+    const rec = getPrayedFor(key);
+    const count = OBLIGATORY.filter(k => rec[k]).length;
+    days.push({ dateKey:key, count, isToday: i===0, dow: d.getDay() });
+  }
+  return days;
 }
 
 const PRAYER_DEFS = [
@@ -1019,6 +1197,131 @@ const DHIKR_PHRASES = [
   { ar:"لَا إِلَٰهَ إِلَّا الله", label:"Lā ilāha illAllāh", meaning:"There is no god but Allah" },
 ];
 let dhikrIndex = 0;
+
+// The 99 Names of Allah (Asma-ul-Husna), in the standard, most widely
+// published ordering (per the well-known enumeration in Jami' at-Tirmidhi).
+const ASMA_UL_HUSNA = [
+  { ar:"الرَّحْمَٰن", translit:"Ar-Rahman", meaning:"The Most Compassionate" },
+  { ar:"الرَّحِيم", translit:"Ar-Raheem", meaning:"The Most Merciful" },
+  { ar:"الْمَلِك", translit:"Al-Malik", meaning:"The King, The Sovereign" },
+  { ar:"الْقُدُّوس", translit:"Al-Quddus", meaning:"The Most Holy, The Pure" },
+  { ar:"السَّلَام", translit:"As-Salam", meaning:"The Source of Peace" },
+  { ar:"الْمُؤْمِن", translit:"Al-Mu'min", meaning:"The Granter of Security" },
+  { ar:"الْمُهَيْمِن", translit:"Al-Muhaymin", meaning:"The Guardian, The Protector" },
+  { ar:"الْعَزِيز", translit:"Al-Aziz", meaning:"The Almighty, The Honorable" },
+  { ar:"الْجَبَّار", translit:"Al-Jabbar", meaning:"The Compeller, The Restorer" },
+  { ar:"الْمُتَكَبِّر", translit:"Al-Mutakabbir", meaning:"The Supreme, The Majestic" },
+  { ar:"الْخَالِق", translit:"Al-Khaliq", meaning:"The Creator" },
+  { ar:"الْبَارِئ", translit:"Al-Bari'", meaning:"The Evolver, The Maker" },
+  { ar:"الْمُصَوِّر", translit:"Al-Musawwir", meaning:"The Fashioner, The Shaper" },
+  { ar:"الْغَفَّار", translit:"Al-Ghaffar", meaning:"The Repeatedly Forgiving" },
+  { ar:"الْقَهَّار", translit:"Al-Qahhar", meaning:"The Subduer, The Ever-Dominant" },
+  { ar:"الْوَهَّاب", translit:"Al-Wahhab", meaning:"The Bestower" },
+  { ar:"الرَّزَّاق", translit:"Ar-Razzaq", meaning:"The Provider" },
+  { ar:"الْفَتَّاح", translit:"Al-Fattah", meaning:"The Opener, The Judge" },
+  { ar:"الْعَلِيم", translit:"Al-'Alim", meaning:"The All-Knowing" },
+  { ar:"الْقَابِض", translit:"Al-Qabid", meaning:"The Withholder, The Constrictor" },
+  { ar:"الْبَاسِط", translit:"Al-Basit", meaning:"The Extender, The Expander" },
+  { ar:"الْخَافِض", translit:"Al-Khafid", meaning:"The Abaser" },
+  { ar:"الرَّافِع", translit:"Ar-Rafi'", meaning:"The Exalter" },
+  { ar:"الْمُعِزّ", translit:"Al-Mu'izz", meaning:"The Bestower of Honor" },
+  { ar:"الْمُذِلّ", translit:"Al-Muthill", meaning:"The One Who Withholds Honor" },
+  { ar:"السَّمِيع", translit:"As-Sami'", meaning:"The All-Hearing" },
+  { ar:"الْبَصِير", translit:"Al-Basir", meaning:"The All-Seeing" },
+  { ar:"الْحَكَم", translit:"Al-Hakam", meaning:"The Judge, The Arbitrator" },
+  { ar:"الْعَدْل", translit:"Al-'Adl", meaning:"The Utterly Just" },
+  { ar:"اللَّطِيف", translit:"Al-Latif", meaning:"The Subtle, The Most Gentle" },
+  { ar:"الْخَبِير", translit:"Al-Khabir", meaning:"The All-Aware" },
+  { ar:"الْحَلِيم", translit:"Al-Halim", meaning:"The Forbearing" },
+  { ar:"الْعَظِيم", translit:"Al-'Azim", meaning:"The Magnificent, The Great" },
+  { ar:"الْغَفُور", translit:"Al-Ghafur", meaning:"The Forgiving" },
+  { ar:"الشَّكُور", translit:"Ash-Shakur", meaning:"The Most Appreciative" },
+  { ar:"الْعَلِيّ", translit:"Al-'Aliyy", meaning:"The Most High" },
+  { ar:"الْكَبِير", translit:"Al-Kabir", meaning:"The Greatest" },
+  { ar:"الْحَفِيظ", translit:"Al-Hafiz", meaning:"The Preserver" },
+  { ar:"المُقيت", translit:"Al-Muqit", meaning:"The Sustainer, The Nourisher" },
+  { ar:"الْحسِيب", translit:"Al-Hasib", meaning:"The Reckoner" },
+  { ar:"الْجَلِيل", translit:"Al-Jalil", meaning:"The Majestic" },
+  { ar:"الْكَرِيم", translit:"Al-Karim", meaning:"The Most Generous" },
+  { ar:"الرَّقِيب", translit:"Ar-Raqib", meaning:"The Watchful" },
+  { ar:"الْمُجِيب", translit:"Al-Mujib", meaning:"The Responsive, The Answerer" },
+  { ar:"الْوَاسِع", translit:"Al-Wasi'", meaning:"The All-Encompassing, The Vast" },
+  { ar:"الْحَكِيم", translit:"Al-Hakim", meaning:"The All-Wise" },
+  { ar:"الْوَدُود", translit:"Al-Wadud", meaning:"The Most Loving" },
+  { ar:"الْمَجِيد", translit:"Al-Majid", meaning:"The Glorious, The Majestic" },
+  { ar:"الْبَاعِث", translit:"Al-Ba'ith", meaning:"The Resurrector" },
+  { ar:"الشَّهِيد", translit:"Ash-Shahid", meaning:"The Witness" },
+  { ar:"الْحَقّ", translit:"Al-Haqq", meaning:"The Absolute Truth" },
+  { ar:"الْوَكِيل", translit:"Al-Wakil", meaning:"The Trustee, Disposer of Affairs" },
+  { ar:"الْقَوِيّ", translit:"Al-Qawiyy", meaning:"The Most Strong" },
+  { ar:"الْمَتِين", translit:"Al-Matin", meaning:"The Firm, The Steadfast" },
+  { ar:"الْوَلِيّ", translit:"Al-Waliyy", meaning:"The Protecting Friend" },
+  { ar:"الْحَمِيد", translit:"Al-Hamid", meaning:"The Praiseworthy" },
+  { ar:"الْمُحْصِي", translit:"Al-Muhsi", meaning:"The Reckoner, The Counter" },
+  { ar:"الْمُبْدِئ", translit:"Al-Mubdi'", meaning:"The Originator" },
+  { ar:"الْمُعِيد", translit:"Al-Mu'id", meaning:"The Restorer, The Reproducer" },
+  { ar:"الْمُحْيِي", translit:"Al-Muhyi", meaning:"The Giver of Life" },
+  { ar:"اَلْمُمِيت", translit:"Al-Mumit", meaning:"The Bringer of Death" },
+  { ar:"الْحَيّ", translit:"Al-Hayy", meaning:"The Ever-Living" },
+  { ar:"الْقَيُّوم", translit:"Al-Qayyum", meaning:"The Self-Subsisting Sustainer" },
+  { ar:"الْوَاجِد", translit:"Al-Wajid", meaning:"The Finder, The Perceiver" },
+  { ar:"الْمَاجِد", translit:"Al-Majid", meaning:"The Noble, The Glorious" },
+  { ar:"الْواحِد", translit:"Al-Wahid", meaning:"The One" },
+  { ar:"الْأَحَد", translit:"Al-Ahad", meaning:"The Unique, The Only One" },
+  { ar:"الصَّمَد", translit:"As-Samad", meaning:"The Eternal, The Self-Sufficient" },
+  { ar:"الْقَادِر", translit:"Al-Qadir", meaning:"The All-Powerful" },
+  { ar:"الْمُقْتَدِر", translit:"Al-Muqtadir", meaning:"The Determiner, The Powerful" },
+  { ar:"الْمُقَدِّم", translit:"Al-Muqaddim", meaning:"The Expediter, The Promoter" },
+  { ar:"الْمُؤَخِّر", translit:"Al-Mu'akhkhir", meaning:"The Delayer" },
+  { ar:"الْأَوَّل", translit:"Al-Awwal", meaning:"The First" },
+  { ar:"الْآخِر", translit:"Al-Akhir", meaning:"The Last" },
+  { ar:"الظَّاهِر", translit:"Az-Zahir", meaning:"The Manifest, The Evident" },
+  { ar:"الْبَاطِن", translit:"Al-Batin", meaning:"The Hidden, The Unseen" },
+  { ar:"الْوَالِي", translit:"Al-Wali", meaning:"The Governing Friend" },
+  { ar:"الْمُتَعَالِي", translit:"Al-Muta'ali", meaning:"The Most Exalted" },
+  { ar:"الْبَرّ", translit:"Al-Barr", meaning:"The Source of All Goodness" },
+  { ar:"التَّوَّاب", translit:"At-Tawwab", meaning:"The Ever-Accepting of Repentance" },
+  { ar:"الْمُنْتَقِم", translit:"Al-Muntaqim", meaning:"The Avenger" },
+  { ar:"العَفُوّ", translit:"Al-'Afuww", meaning:"The Pardoner" },
+  { ar:"الرَّؤُوف", translit:"Ar-Ra'uf", meaning:"The Most Kind" },
+  { ar:"مَالِكُ الْمُلْك", translit:"Malik-ul-Mulk", meaning:"Owner of All Sovereignty" },
+  { ar:"ذُوالْجَلَالِ وَالْإِكْرَام", translit:"Dhu-l-Jalali wa-l-Ikram", meaning:"Lord of Majesty and Generosity" },
+  { ar:"الْمُقْسِط", translit:"Al-Muqsit", meaning:"The Equitable, The Just" },
+  { ar:"الْجَامِع", translit:"Al-Jami'", meaning:"The Gatherer, The Uniter" },
+  { ar:"الْغَنِيّ", translit:"Al-Ghani", meaning:"The Self-Sufficient" },
+  { ar:"الْمُغْنِي", translit:"Al-Mughni", meaning:"The Enricher" },
+  { ar:"الْمَانِع", translit:"Al-Mani'", meaning:"The Preventer" },
+  { ar:"الضَّار", translit:"Ad-Darr", meaning:"The One Who Allows Harm (as a test)" },
+  { ar:"النَّافِع", translit:"An-Nafi'", meaning:"The Benefactor" },
+  { ar:"النُّور", translit:"An-Nur", meaning:"The Light" },
+  { ar:"الْهَادِي", translit:"Al-Hadi", meaning:"The Guide" },
+  { ar:"الْبَدِيع", translit:"Al-Badi'", meaning:"The Incomparable Originator" },
+  { ar:"الْبَاقِي", translit:"Al-Baqi", meaning:"The Everlasting" },
+  { ar:"الْوَارِث", translit:"Al-Warith", meaning:"The Inheritor of All" },
+  { ar:"الرَّشِيد", translit:"Ar-Rashid", meaning:"The Guide to the Right Path" },
+  { ar:"الصَّبُور", translit:"As-Sabur", meaning:"The Most Patient" },
+];
+
+function renderNamesOfAllah(){
+  const el = document.getElementById("namesGrid");
+  el.innerHTML = ASMA_UL_HUSNA.map((n,i) => `
+    <div class="name-card">
+      <div class="num">${i+1}</div>
+      <div class="ar">${n.ar}</div>
+      <div class="translit">${n.translit}</div>
+      <div class="meaning">${n.meaning}</div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("namesEntryBtn").addEventListener("click", ()=>{
+  document.getElementById("duaMainPane").style.display = "none";
+  document.getElementById("namesPane").style.display = "block";
+});
+document.getElementById("namesBackBtn").addEventListener("click", ()=>{
+  document.getElementById("namesPane").style.display = "none";
+  document.getElementById("duaMainPane").style.display = "block";
+});
 
 // Only one reciter identifier is hand-typed here — everything else in the
 // dropdown is always pulled live from the API (see loadReciters below).
@@ -1101,6 +1404,28 @@ function computeIsRamadan(){
   return h.month === 9;
 }
 
+function renderGreeting(){
+  const h = new Date().getHours();
+  let greeting;
+  if (h < 5) greeting = "Assalamu Alaikum — still up late?";
+  else if (h < 12) greeting = "Assalamu Alaikum, good morning";
+  else if (h < 17) greeting = "Assalamu Alaikum, good afternoon";
+  else if (h < 21) greeting = "Assalamu Alaikum, good evening";
+  else greeting = "Assalamu Alaikum, good night";
+  document.getElementById("heroGreeting").textContent = greeting;
+}
+
+const WEEKDAY_LETTERS = ["S","M","T","W","T","F","S"];
+function renderStreakCard(){
+  const streak = computeStreak();
+  document.getElementById("streakCount").textContent = streak;
+  const week = getWeekHistory();
+  document.getElementById("streakWeek").innerHTML = week.map(d=>{
+    const cls = d.count===5 ? "complete" : d.count>0 ? "partial" : "";
+    return `<div class="streak-day ${cls} ${d.isToday?'today':''}" title="${d.count}/5 prayers">${WEEKDAY_LETTERS[d.dow]}</div>`;
+  }).join("");
+}
+
 function refreshPrayerTimes(){
   if (!state.coords) return;
   const now = new Date();
@@ -1150,6 +1475,8 @@ function renderPrayerList(now, ramadan){
   }
 
   list.innerHTML = "";
+  const todaysKey = todayKey(now);
+  const todaysRecord = getPrayedFor(todaysKey);
   PRAYER_DEFS.forEach(p=>{
     const d = dates[p.key];
     const adj = state.adjustments[p.key] || 0;
@@ -1157,8 +1484,8 @@ function renderPrayerList(now, ramadan){
     row.className = "prayer-row" + (p.key===nextKey && !usingTomorrowFajr ? " next" : "") + (d && d.getTime()<now.getTime() ? " passed":"");
     const isObligatory = OBLIGATORY.includes(p.key);
     row.innerHTML = `
-      ${isObligatory ? `<button class="pcheck ${state.prayedToday[p.key]?'done':''}" data-key="${p.key}" aria-label="Mark ${p.en} as prayed">
-        ${state.prayedToday[p.key] ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0E1F1B" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
+      ${isObligatory ? `<button class="pcheck ${todaysRecord[p.key]?'done':''}" data-key="${p.key}" aria-label="Mark ${p.en} as prayed">
+        ${todaysRecord[p.key] ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0E1F1B" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
       </button>` : `<div style="width:26px;"></div>`}
       <div class="pnames">
         <div class="pname">${p.en}</div>
@@ -1172,8 +1499,10 @@ function renderPrayerList(now, ramadan){
   list.querySelectorAll(".pcheck").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const k = btn.dataset.key;
-      state.prayedToday[k] = !state.prayedToday[k];
+      togglePrayedFor(todaysKey, k);
+      persistSettings();
       renderPrayerList(new Date(), ramadan);
+      renderStreakCard();
     });
   });
 
@@ -1450,6 +1779,71 @@ async function enableCompass(){
 const QURAN_API = "https://api.alquran.cloud/v1";
 const AUDIO_BITRATES = [128, 192, 64, 48];
 
+/* ============================================================
+   9b. VERSE OF THE DAY
+   A curated list of well-known, self-contained (no surrounding context
+   needed), widely-cited verses — deterministically picked by day of year
+   so everyone sees the same verse on a given day and it changes daily.
+   Text itself is always fetched live from the Qur'an API (never hardcoded)
+   so it respects the person's chosen translation and stays exact.
+============================================================ */
+const VERSE_OF_DAY_REFS = [
+  {s:2,a:255},{s:2,a:286},{s:94,a:5},{s:94,a:6},{s:65,a:3},{s:13,a:28},{s:39,a:53},
+  {s:2,a:152},{s:55,a:13},{s:2,a:153},{s:3,a:139},{s:21,a:87},{s:24,a:35},{s:49,a:13},
+  {s:41,a:34},{s:3,a:200},{s:29,a:69},{s:12,a:87},{s:2,a:186},{s:31,a:17},{s:112,a:1},
+  {s:14,a:7},{s:33,a:41},{s:39,a:10},{s:42,a:19},{s:20,a:25},{s:3,a:159},{s:16,a:97},
+  {s:25,a:63},{s:6,a:59},{s:17,a:23},{s:2,a:201},{s:3,a:190},{s:9,a:40},{s:59,a:24},
+  {s:89,a:27},{s:1,a:1},{s:1,a:2},{s:1,a:5},{s:1,a:6},
+];
+
+function dayOfYear(d){
+  const start = new Date(d.getFullYear(), 0, 0);
+  return Math.floor((d - start) / 86400000);
+}
+
+let verseCache = { key:null, data:null };
+async function loadVerseOfTheDay(){
+  const key = todayKey() + ":" + state.translationEdition;
+  if (verseCache.key === key && verseCache.data){
+    renderVerseCard(verseCache.data);
+    return;
+  }
+  const idx = dayOfYear(new Date()) % VERSE_OF_DAY_REFS.length;
+  const ref = VERSE_OF_DAY_REFS[idx];
+  try{
+    const res = await fetch(`${QURAN_API}/ayah/${ref.s}:${ref.a}/editions/quran-uthmani,${state.translationEdition}`);
+    const json = await res.json();
+    if (!json || !json.data || json.data.length < 2) throw new Error("bad response");
+    const arabicEd = json.data[0];
+    const translationEd = json.data[1];
+    const data = {
+      arabic: arabicEd.text,
+      translation: translationEd.text,
+      surahName: arabicEd.surah ? arabicEd.surah.englishName : "",
+      surahNumber: ref.s,
+      ayahNumber: ref.a,
+      globalNumber: arabicEd.number,
+    };
+    verseCache = { key, data };
+    renderVerseCard(data);
+  } catch(e){
+    document.getElementById("verseCard").style.display = "none";
+  }
+}
+
+function renderVerseCard(data){
+  document.getElementById("verseArabic").textContent = data.arabic;
+  document.getElementById("verseTranslation").textContent = data.translation;
+  document.getElementById("verseRef").textContent = `${data.surahName} · ${data.surahNumber}:${data.ayahNumber}`;
+  document.getElementById("verseCard").style.display = "block";
+  document.getElementById("versePlayBtn").onclick = ()=>{
+    playAudioWithFallback(
+      (bitrate)=> `https://cdn.islamic.network/quran/audio/${bitrate}/${state.reciter}/${data.globalNumber}.mp3`,
+      { onFail: ()=> showToast("Couldn't play this verse with the selected reciter.", 3500) }
+    );
+  };
+}
+
 async function loadReciters(){
   const select = document.getElementById("reciterSelect");
   function populate(list){
@@ -1553,6 +1947,7 @@ document.getElementById("translationSelect").addEventListener("change", (e)=>{
   state.translationEdition = e.target.value;
   persistSettings();
   if (currentSurahNumber) openSurah(currentSurahNumber);
+  loadVerseOfTheDay();
 });
 
 function showQuranPane(which){
@@ -1663,7 +2058,24 @@ function renderAyahs(){
       renderAyahs();
     });
   });
+  applyQuranFontSize();
 }
+
+const QURAN_FONT_SIZES = { small:19, medium:23, large:28 };
+function applyQuranFontSize(){
+  const px = QURAN_FONT_SIZES[state.quranFontSize] || QURAN_FONT_SIZES.medium;
+  document.querySelectorAll(".ayah-arabic").forEach(el => el.style.fontSize = px + "px");
+  document.querySelectorAll(".font-size-btn").forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.size === state.quranFontSize);
+  });
+}
+document.querySelectorAll(".font-size-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    state.quranFontSize = btn.dataset.size;
+    applyQuranFontSize();
+    persistSettings();
+  });
+});
 
 document.getElementById("toggleTranslationBtn").addEventListener("click", (e)=>{
   state.showTranslation = !state.showTranslation;
@@ -2065,6 +2477,36 @@ backdrop.addEventListener("click", closeSheet);
 
 document.getElementById("useMyLocationBtn").addEventListener("click", ()=>{ closeSheet(); useDeviceLocation(); });
 
+function buildShareText(){
+  if (!currentPrayerDates || !currentPrayerDates.fajr) return null;
+  const dateLabel = new Date().toLocaleDateString(undefined, { weekday:"long", day:"numeric", month:"long" });
+  const lines = [`Prayer times for ${state.locationLabel} — ${dateLabel}`, ""];
+  PRAYER_DEFS.forEach(p=>{
+    const d = currentPrayerDates[p.key];
+    if (d) lines.push(`${p.en}: ${fmtTime(d, state.use24h)}`);
+  });
+  lines.push("", "via Mawaqit");
+  return lines.join("\n");
+}
+
+document.getElementById("shareBtn").addEventListener("click", async ()=>{
+  const text = buildShareText();
+  if (!text){ showToast("Set your location first to share today's times."); return; }
+  if (navigator.share){
+    try{ await navigator.share({ title:"Prayer Times", text }); }
+    catch(e){ /* person cancelled the native share sheet — nothing to do */ }
+  } else if (navigator.clipboard){
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast("Prayer times copied to clipboard!");
+    } catch(e){
+      showToast("Couldn't copy — try again or take a screenshot instead.");
+    }
+  } else {
+    showToast("Sharing isn't supported in this browser — try taking a screenshot instead.");
+  }
+});
+
 document.getElementById("installBtn").addEventListener("click", async ()=>{
   if (deferredInstallPrompt){
     deferredInstallPrompt.prompt();
@@ -2222,11 +2664,14 @@ document.getElementById("hijriPlusBtn").addEventListener("click", ()=> adjustHij
 async function init(){
   hydrateSettings();
 
+  renderGreeting();
   renderHijri();
   renderHijriOffsetControls();
+  renderStreakCard();
   renderDuas();
   renderAdjustList();
   populateAdhanSelect();
+  renderNamesOfAllah();
   setNotifUI(!!state.notifOn);
   setAdhanUI(state.adhanEnabled !== false);
   if (state.notifOn){ state.notifTimer = setInterval(fireReminder, 3*60*60*1000); }
@@ -2238,10 +2683,12 @@ async function init(){
   document.querySelectorAll("#timeSeg button").forEach(b=>{
     b.classList.toggle("active", (b.dataset.val === "24") === state.use24h);
   });
+  applyQuranFontSize();
 
   await loadReciters();
   await loadTranslations();
   loadSurahList();
+  loadVerseOfTheDay();
 
   if (state.coords){
     // returning visit — we already know where the person is
