@@ -380,6 +380,7 @@
   .adjust-btn{ width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--parchment); font-size:16px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; user-select:none; touch-action:manipulation; }
   .adjust-btn:active{ background:var(--surface-3); }
   .adjust-val{ min-width:64px; text-align:center; font-variant-numeric: tabular-nums; font-size:12.5px; color:var(--gold-bright); font-weight:600; }
+  .hijri-preview{ font-size:13px; color:var(--gold-bright); margin: 4px 0 8px; font-weight:500; }
 
   .adhan-row{ display:flex; gap:8px; margin-top:8px; }
   .adhan-row select{ flex:1; height:42px; }
@@ -599,6 +600,16 @@
   <p class="field-label" style="margin-top:-4px;">Nudge a prayer up to 3 hours earlier or later — handy for matching your local mosque.</p>
   <div class="adjust-list" id="adjustList"></div>
   <button class="dhikr-reset" id="resetAdjustBtn" style="margin-top:8px;">Reset all to calculated times</button>
+
+  <h3>Islamic calendar</h3>
+  <p class="field-label" style="margin-top:-4px;">The Hijri date is calculated (tabular Islamic calendar), not read from your device, so it's consistent everywhere — but it can be a day or two off from your local mosque's moon-sighting-based date. Adjust it here to match.</p>
+  <div class="hijri-preview" id="hijriPreview">Today: —</div>
+  <div class="adjust-row">
+    <span class="adjust-name">Adjustment</span>
+    <button class="adjust-btn" id="hijriMinusBtn" aria-label="Shift Hijri date back one day">−</button>
+    <span class="adjust-val" id="hijriOffsetVal">0 days</span>
+    <button class="adjust-btn" id="hijriPlusBtn" aria-label="Shift Hijri date forward one day">+</button>
+  </div>
 
   <h3>Asr school</h3>
   <div class="seg" id="asrSeg">
@@ -830,8 +841,9 @@ function jdToHijri(jd){
   return { year, month, day };
 }
 
-function getHijri(date){
-  const jd = gregorianToJD(date.getFullYear(), date.getMonth()+1, date.getDate());
+function getHijri(date, offsetDaysOverride){
+  const offset = offsetDaysOverride !== undefined ? offsetDaysOverride : (state.hijriOffsetDays || 0);
+  const jd = gregorianToJD(date.getFullYear(), date.getMonth()+1, date.getDate()) + offset;
   const h = jdToHijri(jd);
   const monthName = HIJRI_MONTH_NAMES[h.month - 1] || "";
   return { label: `${monthName} ${h.day}, ${h.year} AH`, month: h.month, day: h.day, year: h.year };
@@ -851,7 +863,7 @@ function daysUntilRamadan(){
 
 let ramadanCountdownCache = { dateKey:null, days:null };
 function getDaysUntilRamadanCached(){
-  const key = new Date().toDateString();
+  const key = new Date().toDateString() + ":" + (state.hijriOffsetDays || 0);
   if (ramadanCountdownCache.dateKey === key) return ramadanCountdownCache.days;
   const days = daysUntilRamadan();
   ramadanCountdownCache = { dateKey:key, days };
@@ -902,6 +914,7 @@ const state = {
   adjustments: { fajr:0, dhuhr:0, asr:0, maghrib:0, isha:0 },
   adhanId: "makkah",
   adhanEnabled: true,
+  hijriOffsetDays: 0,
 };
 
 function persistSettings(){
@@ -918,6 +931,7 @@ function persistSettings(){
     coords: state.coords,
     locationLabel: state.locationLabel,
     notifOn: state.notifOn,
+    hijriOffsetDays: state.hijriOffsetDays,
   };
   safeStorage.set(STORAGE_KEY, JSON.stringify(toSave));
 }
@@ -930,6 +944,7 @@ function hydrateSettings(){
     Object.assign(state, saved);
     state.adjustments = Object.assign({ fajr:0, dhuhr:0, asr:0, maghrib:0, isha:0 }, saved.adjustments || {});
     state.bookmarks = Array.isArray(saved.bookmarks) ? saved.bookmarks : [];
+    state.hijriOffsetDays = Number.isFinite(saved.hijriOffsetDays) ? saved.hijriOffsetDays : 0;
   } catch(e){ /* corrupt/old data — ignore and keep defaults */ }
 }
 
@@ -1302,10 +1317,6 @@ function drawCompass(headingDeg, bearingDeg){
   svg.innerHTML = `
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="#15302A" stroke="#C9A24D" stroke-width="1.2" opacity="0.9"/>
     ${ticks}
-    <text x="${cx}" y="${cy-r+26}" text-anchor="middle" fill="#8FA39C" font-size="12" font-family="Inter">N</text>
-    <text x="${cx+r-18}" y="${cy+4}" text-anchor="middle" fill="#8FA39C" font-size="12" font-family="Inter">E</text>
-    <text x="${cx}" y="${cy+r-14}" text-anchor="middle" fill="#8FA39C" font-size="12" font-family="Inter">S</text>
-    <text x="${cx-r+18}" y="${cy+4}" text-anchor="middle" fill="#8FA39C" font-size="12" font-family="Inter">W</text>
     <g>
       <line x1="${cx}" y1="${cy}" x2="${shaftEndX}" y2="${shaftEndY}" stroke="#E5C374" stroke-width="2" stroke-linecap="round"/>
       <circle cx="${cx}" cy="${cy}" r="5" fill="#E5C374" stroke="#0E1F1B" stroke-width="1.5"/>
@@ -2187,6 +2198,24 @@ function renderHijri(){
   document.getElementById("hijriRow").textContent = h.label ? `${greg} · ${h.label}` : greg;
 }
 
+function renderHijriOffsetControls(){
+  const h = getHijri(new Date());
+  document.getElementById("hijriPreview").textContent = "Today: " + h.label;
+  const val = state.hijriOffsetDays || 0;
+  document.getElementById("hijriOffsetVal").textContent = (val>0?"+":"") + val + (Math.abs(val)===1 ? " day" : " days");
+}
+
+function adjustHijriOffset(delta){
+  const cur = state.hijriOffsetDays || 0;
+  state.hijriOffsetDays = Math.max(-5, Math.min(5, cur + delta));
+  renderHijriOffsetControls();
+  renderHijri();
+  if (state.coords) refreshPrayerTimes(); // re-renders the Ramadan banner, which also depends on the Hijri date
+  persistSettings();
+}
+document.getElementById("hijriMinusBtn").addEventListener("click", ()=> adjustHijriOffset(-1));
+document.getElementById("hijriPlusBtn").addEventListener("click", ()=> adjustHijriOffset(1));
+
 /* ============================================================
    15. INIT
 ============================================================ */
@@ -2194,6 +2223,7 @@ async function init(){
   hydrateSettings();
 
   renderHijri();
+  renderHijriOffsetControls();
   renderDuas();
   renderAdjustList();
   populateAdhanSelect();
