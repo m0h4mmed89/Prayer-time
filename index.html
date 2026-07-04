@@ -392,6 +392,30 @@
   .names-entry-title{ font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--gold-bright); }
   .names-entry-sub{ font-size:11.5px; color:var(--muted); margin-top:2px; }
   .names-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+
+  .collection-grid{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+  .collection-card{
+    text-align:left; padding:18px; border-radius: var(--radius); cursor:pointer;
+    background: linear-gradient(150deg, var(--surface-2), var(--surface));
+    border:1px solid var(--line); color:var(--parchment); font-family:inherit;
+  }
+  .collection-name{ font-family:var(--font-display); font-size:17px; font-weight:600; color:var(--gold-bright); }
+  .collection-meta{ font-size:12px; color:var(--muted); margin-top:4px; }
+  .book-meta-count{ font-size:11px; color:var(--turquoise); font-weight:600; }
+
+  .grade-badge{
+    display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:.03em;
+    padding:2px 7px; border-radius:999px; margin-left:6px; vertical-align:middle;
+    background: rgba(79,168,151,0.18); color: var(--turquoise);
+  }
+  .grade-badge.weak{ background: rgba(201,105,77,0.18); color: #E8A48F; }
+  .hadith-ref{ font-size:10.5px; color:var(--muted); margin-top:8px; }
+  .listen-btn{
+    display:inline-flex; align-items:center; gap:5px; margin-top:10px;
+    font-size:11.5px; color:var(--gold-bright); background:var(--surface-2);
+    border:1px solid var(--line); border-radius:999px; padding:6px 12px; cursor:pointer;
+  }
+  .listen-btn.playing{ border-color: var(--gold); }
   .name-card{ background:var(--surface); border:1px solid var(--line-soft); border-radius: var(--radius-sm); padding:12px; text-align:center; }
   .name-card .num{ font-size:10px; color:var(--turquoise); font-weight:700; }
   .name-card .ar{ font-family:var(--font-arabic); font-size:19px; color:var(--gold-bright); margin-top:4px; }
@@ -613,6 +637,63 @@
       </div>
     </section>
 
+    <!-- ===== HADITH VIEW ===== -->
+    <section class="view" id="view-hadith">
+      <div id="hadithCollectionPane">
+        <div class="section-label" style="margin-top:6px;">Hadith library</div>
+        <div class="collection-grid">
+          <button class="collection-card" id="collectionBukhariBtn">
+            <div class="collection-name">Sahih al-Bukhari</div>
+            <div class="collection-meta">صحيح البخاري · 97 books</div>
+          </button>
+          <button class="collection-card" id="collectionMuslimBtn">
+            <div class="collection-name">Sahih Muslim</div>
+            <div class="collection-meta">صحيح مسلم · 56 books</div>
+          </button>
+        </div>
+        <p class="field-label" style="margin-top:14px;">Text streams live from an open hadith API (English: Muhsin Khan / Abdul Hamid Siddiqui translations), matching the source used by most hadith study sites.</p>
+      </div>
+
+      <div id="hadithBookListPane" style="display:none;">
+        <div class="reader-head">
+          <button class="icon-btn" id="hadithBookListBackBtn" aria-label="Back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="reader-title">
+            <div class="en" id="hadithCollectionTitle">—</div>
+            <div class="ar" id="hadithCollectionTitleAr">—</div>
+          </div>
+          <button class="icon-btn" id="hadithBookmarksBtn" aria-label="Hadith bookmarks">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+          </button>
+        </div>
+        <input class="search-input" id="hadithSearchInput" placeholder="Search this collection…" style="margin-top:12px;" />
+        <div class="surah-list" id="hadithBookList" style="margin-top:12px;"></div>
+      </div>
+
+      <div id="hadithReaderPane" style="display:none;">
+        <div class="reader-head">
+          <button class="icon-btn" id="hadithReaderBackBtn" aria-label="Back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="reader-title">
+            <div class="en" id="hadithBookTitle">—</div>
+          </div>
+        </div>
+        <div class="ayah-list" id="hadithList" style="margin-top:12px;"></div>
+      </div>
+
+      <div id="hadithBookmarksPane" style="display:none;">
+        <div class="reader-head">
+          <button class="icon-btn" id="hadithBookmarksBackBtn" aria-label="Back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="reader-title"><div class="en">Hadith bookmarks</div></div>
+        </div>
+        <div class="surah-list" id="hadithBookmarksList" style="margin-top:14px;"></div>
+      </div>
+    </section>
+
     <!-- ===== DUA VIEW ===== -->
     <section class="view" id="view-dua">
       <div id="duaMainPane">
@@ -682,6 +763,10 @@
       <button class="tab" data-view="quran">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         <span>Qur'an</span>
+      </button>
+      <button class="tab" data-view="hadith">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4h9a2 2 0 0 1 2 2v13a1 1 0 0 1-1.4.9L14 18l-3.6 1.9A1 1 0 0 1 9 19V6a2 2 0 0 0-2-2z"/><path d="M8 4a2 2 0 0 0-2 2v14"/><line x1="12" y1="8" x2="16" y2="8"/><line x1="12" y1="11" x2="16" y2="11"/></svg>
+        <span>Hadith</span>
       </button>
       <button class="tab" data-view="dua">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
@@ -758,6 +843,9 @@
   </p>
   <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
     The Hijri date is calculated (the standard tabular Islamic calendar), not read from a browser calendar API, so it's consistent on every device — it can occasionally be a day off from your local mosque's moon-sighting-based date, same as any calculated Islamic calendar.
+  </p>
+  <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
+    Hadith text (Sahih al-Bukhari and Sahih Muslim, Arabic and English) streams live from an open hadith API, same approach as the Qur'an. One honest note: unlike the Qur'an, there isn't a reliable, licensed, per-hadith audio recitation source to draw on, so "Listen" uses your browser's built-in text-to-speech to read the English translation aloud rather than a recorded reciter.
   </p>
   <button class="btn btn-ghost" id="closeSheetBtn" style="width:100%;">Close</button>
 </div>
@@ -1027,6 +1115,7 @@ const state = {
   adhanEnabled: true,
   hijriOffsetDays: 0,
   quranFontSize: "medium",
+  hadithBookmarks: [],
 };
 
 function persistSettings(){
@@ -1046,6 +1135,7 @@ function persistSettings(){
     hijriOffsetDays: state.hijriOffsetDays,
     prayerHistory: state.prayerHistory,
     quranFontSize: state.quranFontSize,
+    hadithBookmarks: state.hadithBookmarks,
   };
   safeStorage.set(STORAGE_KEY, JSON.stringify(toSave));
 }
@@ -1061,6 +1151,7 @@ function hydrateSettings(){
     state.hijriOffsetDays = Number.isFinite(saved.hijriOffsetDays) ? saved.hijriOffsetDays : 0;
     state.prayerHistory = (saved.prayerHistory && typeof saved.prayerHistory === "object") ? saved.prayerHistory : {};
     state.quranFontSize = saved.quranFontSize || "medium";
+    state.hadithBookmarks = Array.isArray(saved.hadithBookmarks) ? saved.hadithBookmarks : [];
   } catch(e){ /* corrupt/old data — ignore and keep defaults */ }
 }
 
@@ -1181,6 +1272,54 @@ const DUAS = [
   { occasion:"Forgiveness", ar:"رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ",
     translit:"Rabbighfir li wa tub 'alayya innaka antat-Tawwabur-Raheem",
     meaning:"My Lord, forgive me and accept my repentance — You are the Ever-Returning, the Merciful." },
+  { occasion:"Before sleeping", ar:"بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+    translit:"Bismika Allahumma amutu wa ahya",
+    meaning:"In Your name, O Allah, I die and I live." },
+  { occasion:"Upon waking", ar:"الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+    translit:"Alhamdu lillahil-ladhi ahyana ba'da ma amatana wa ilayhin-nushur",
+    meaning:"Praise be to Allah who gave us life after having caused us to die, and to Him is the resurrection." },
+  { occasion:"Leaving home", ar:"بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+    translit:"Bismillahi tawakkaltu 'alallahi wa la hawla wa la quwwata illa billah",
+    meaning:"In the name of Allah, I place my trust in Allah, and there is no might nor power except with Allah." },
+  { occasion:"Entering the mosque", ar:"اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+    translit:"Allahumma iftah li abwaba rahmatik",
+    meaning:"O Allah, open the doors of Your mercy for me." },
+  { occasion:"Leaving the mosque", ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+    translit:"Allahumma inni as'aluka min fadlik",
+    meaning:"O Allah, I ask You from Your bounty." },
+  { occasion:"Upon calamity or bad news", ar:"إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ",
+    translit:"Inna lillahi wa inna ilayhi raji'un",
+    meaning:"Indeed we belong to Allah, and indeed to Him we will return." },
+  { occasion:"When it rains", ar:"اللَّهُمَّ صَيِّبًا نَافِعًا",
+    translit:"Allahumma sayyiban nafi'an",
+    meaning:"O Allah, (bring) beneficial rain clouds." },
+  { occasion:"Seeking beneficial knowledge", ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا",
+    translit:"Allahumma inni as'aluka 'ilman nafi'an wa rizqan tayyiban wa 'amalan mutaqabbalan",
+    meaning:"O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds." },
+  { occasion:"When a task feels difficult", ar:"اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا",
+    translit:"Allahumma la sahla illa ma ja'altahu sahlan, wa anta taj'alul-hazna idha shi'ta sahlan",
+    meaning:"O Allah, there is nothing easy except what You make easy, and You make hardship easy if You will." },
+  { occasion:"Seeking refuge from trials", ar:"اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ",
+    translit:"Allahumma inni a'udhu bika min fitnatil mahya wal mamat",
+    meaning:"O Allah, I seek refuge in You from the trials of life and death." },
+  { occasion:"For the sick", ar:"لَا بَأْسَ طَهُورٌ إِنْ شَاءَ اللَّهُ",
+    translit:"La ba'sa tahurun in sha Allah",
+    meaning:"No harm — it will be a purification, if Allah wills." },
+  { occasion:"Protection for children", ar:"أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ",
+    translit:"U'idhukuma bikalimatillahit-tammati min kulli shaytanin wa hammatin wa min kulli 'aynin lammah",
+    meaning:"I seek refuge for you both in the perfect words of Allah, from every devil and poisonous creature, and from every evil eye." },
+  { occasion:"In distress", ar:"لَا إِلَٰهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ",
+    translit:"La ilaha illallahul-'Azimul-Halim",
+    meaning:"There is no god but Allah, the Mighty, the Forbearing." },
+  { occasion:"Morning & evening protection", ar:"بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+    translit:"Bismillahil-ladhi la yadurru ma'as-mihi shay'un fil-ardi wa la fis-sama'i wa huwas-Sami'ul-'Alim",
+    meaning:"In the name of Allah, with whose name nothing on earth or in the heaven can cause harm, and He is the All-Hearing, the All-Knowing." },
+  { occasion:"Seeing the new crescent moon", ar:"اللَّهُ أَكْبَرُ اللَّهُمَّ أَهِلَّهُ عَلَيْنَا بِالْأَمْنِ وَالْإِيمَانِ",
+    translit:"Allahu akbar, Allahumma ahillahu 'alayna bil-amni wal-iman",
+    meaning:"Allah is the greatest. O Allah, bring this crescent moon upon us with security and faith." },
+  { occasion:"Thanking someone", ar:"جَزَاكَ اللَّهُ خَيْرًا",
+    translit:"Jazak Allahu khayran",
+    meaning:"May Allah reward you with good." },
   { occasion:"Breaking the fast", ar:"ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
     translit:"Dhahaba al-zama'u wabtallat al-'urooqu wa thabata al-ajru inshaAllah",
     meaning:"The thirst has gone, the veins are moist, and the reward is confirmed, if Allah wills." },
@@ -2254,6 +2393,271 @@ function playSurahSequentially(token){
   }
   playNext();
 }
+
+/* ============================================================
+   9c. HADITH — Sahih al-Bukhari & Sahih Muslim
+   Text (Arabic + English) streams live from fawazahmed0/hadith-api,
+   a free, no-key CDN-hosted collection (verified structure before
+   building this — same care taken as with the Qur'an integration).
+   English translations: Muhsin Khan (Bukhari) / Abdul Hamid Siddiqui
+   (Muslim) — the same translations most hadith study sites use.
+
+   On audio: unlike the Qur'an, there isn't a mature, reliably-licensed,
+   per-hadith recitation CDN to draw on — what exists is scattered and
+   chunked into large multi-hadith files rather than individually
+   playable. Rather than link something shaky, "Listen" here uses the
+   browser's built-in text-to-speech to read the English translation —
+   genuinely reliable and honestly labelled as TTS, not a reciter.
+============================================================ */
+const HADITH_CDN = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1";
+const HADITH_COLLECTIONS = {
+  bukhari: { key:"bukhari", nameEn:"Sahih al-Bukhari", nameAr:"صحيح البخاري", eng:"eng-bukhari", ara:"ara-bukhari" },
+  muslim:  { key:"muslim",  nameEn:"Sahih Muslim",      nameAr:"صحيح مسلم",    eng:"eng-muslim",  ara:"ara-muslim" },
+};
+
+const hadithState = {
+  collectionKey: null,
+  loadedKey: null,
+  metadata: null,        // { sections: {num:name}, section_details: {num:{hadithnumber_first,...}} }
+  englishHadiths: [],    // full array for the loaded collection
+  arabicByNumber: {},    // hadithnumber -> arabic text, filled in per-book as opened
+  arabicLoadedBooks: new Set(),
+  currentHadithsInBook: [],
+};
+
+function showHadithPane(which){
+  document.getElementById("hadithCollectionPane").style.display = which==="collection" ? "block" : "none";
+  document.getElementById("hadithBookListPane").style.display = which==="booklist" ? "block" : "none";
+  document.getElementById("hadithReaderPane").style.display = which==="reader" ? "block" : "none";
+  document.getElementById("hadithBookmarksPane").style.display = which==="bookmarks" ? "block" : "none";
+}
+
+async function openHadithCollection(key){
+  const col = HADITH_COLLECTIONS[key];
+  hadithState.collectionKey = key;
+  document.getElementById("hadithCollectionTitle").textContent = col.nameEn;
+  document.getElementById("hadithCollectionTitleAr").textContent = col.nameAr;
+  showHadithPane("booklist");
+
+  if (hadithState.loadedKey === key && hadithState.metadata){
+    renderHadithBookList();
+    return;
+  }
+
+  document.getElementById("hadithBookList").innerHTML = `<div class="empty-note">Loading book list…</div>`;
+  try{
+    const res = await fetch(`${HADITH_CDN}/editions/${col.eng}.min.json`);
+    const json = await res.json();
+    hadithState.metadata = json.metadata;
+    hadithState.englishHadiths = json.hadiths;
+    hadithState.loadedKey = key;
+    hadithState.arabicByNumber = {};
+    hadithState.arabicLoadedBooks = new Set();
+    renderHadithBookList();
+  } catch(e){
+    document.getElementById("hadithBookList").innerHTML = `<div class="empty-note">Couldn't reach the hadith library right now. Check your connection and try again.</div>`;
+  }
+}
+
+function renderHadithBookList(filterText){
+  const el = document.getElementById("hadithBookList");
+  const sections = hadithState.metadata.sections;
+  const details = hadithState.metadata.section_details || {};
+  let entries = Object.keys(sections)
+    .map(k => parseInt(k,10))
+    .filter(n => n > 0 && sections[n] && String(sections[n]).trim() !== "")
+    .map(n => ({ number:n, name: sections[n], range: details[n] }));
+
+  if (filterText){
+    const q = filterText.toLowerCase();
+    const matchingBooks = new Set(
+      hadithState.englishHadiths.filter(h => h.text && h.text.toLowerCase().includes(q)).map(h => h.reference.book)
+    );
+    entries = entries.filter(e => e.name.toLowerCase().includes(q) || matchingBooks.has(e.number));
+  }
+
+  if (!entries.length){ el.innerHTML = `<div class="empty-note">No matching books or hadith.</div>`; return; }
+
+  el.innerHTML = entries.map(e => {
+    const count = e.range ? (e.range.hadithnumber_last - e.range.hadithnumber_first + 1) : null;
+    return `
+    <div class="surah-row" data-book="${e.number}">
+      <div class="surah-badge"><svg viewBox="0 0 100 100">${starSVG({r:40,w:1.1})}</svg><span>${e.number}</span></div>
+      <div class="surah-info">
+        <div class="surah-name-en">${e.name}</div>
+        <div class="surah-meta">${count ? count + " hadith" : ""}</div>
+      </div>
+    </div>`;
+  }).join("");
+  el.querySelectorAll(".surah-row").forEach(row=>{
+    row.addEventListener("click", ()=> openHadithBook(parseInt(row.dataset.book,10)));
+  });
+}
+
+document.getElementById("hadithSearchInput").addEventListener("input", (e)=>{
+  if (hadithState.metadata) renderHadithBookList(e.target.value.trim());
+});
+
+async function openHadithBook(bookNumber){
+  showHadithPane("reader");
+  stopHadithSpeech();
+  const col = HADITH_COLLECTIONS[hadithState.collectionKey];
+  const bookName = hadithState.metadata.sections[bookNumber] || `Book ${bookNumber}`;
+  document.getElementById("hadithBookTitle").textContent = `${bookNumber}. ${bookName}`;
+  document.getElementById("hadithList").innerHTML = `<div class="empty-note">Loading hadith…</div>`;
+
+  const englishInBook = hadithState.englishHadiths.filter(h => h.reference.book === bookNumber);
+  hadithState.currentHadithsInBook = englishInBook;
+
+  if (!hadithState.arabicLoadedBooks.has(bookNumber)){
+    try{
+      const res = await fetch(`${HADITH_CDN}/editions/${col.ara}/sections/${bookNumber}.min.json`);
+      const json = await res.json();
+      (json.hadiths || []).forEach(h => { hadithState.arabicByNumber[h.hadithnumber] = h.text; });
+      hadithState.arabicLoadedBooks.add(bookNumber);
+    } catch(e){
+      // Arabic is a nice-to-have here — proceed with English-only if this fails
+    }
+  }
+  renderHadithList(englishInBook);
+}
+
+function primaryGrade(grades){
+  if (!grades || !grades.length || !grades[0].grade) return null;
+  const text = grades[0].grade;
+  const weak = /da.?if|munkar|shadh|maudu|weak/i.test(text);
+  return { text, weak };
+}
+
+function isHadithBookmarked(hadithnumber){
+  return state.hadithBookmarks.some(b => b.collectionKey===hadithState.collectionKey && b.hadithnumber===hadithnumber);
+}
+
+function toggleHadithBookmark(h){
+  const col = HADITH_COLLECTIONS[hadithState.collectionKey];
+  const idx = state.hadithBookmarks.findIndex(b => b.collectionKey===hadithState.collectionKey && b.hadithnumber===h.hadithnumber);
+  if (idx >= 0){
+    state.hadithBookmarks.splice(idx,1);
+  } else {
+    state.hadithBookmarks.push({
+      collectionKey: hadithState.collectionKey,
+      collectionName: col.nameEn,
+      hadithnumber: h.hadithnumber,
+      bookNumber: h.reference.book,
+      hadithInBook: h.reference.hadith,
+      textSnippet: h.text.length > 90 ? h.text.slice(0,90) + "…" : h.text,
+    });
+  }
+  persistSettings();
+}
+
+function renderHadithList(hadiths){
+  const el = document.getElementById("hadithList");
+  if (!hadiths.length){ el.innerHTML = `<div class="empty-note">No hadith found in this book.</div>`; return; }
+  el.innerHTML = hadiths.map(h => {
+    const grade = primaryGrade(h.grades);
+    const arabic = hadithState.arabicByNumber[h.hadithnumber];
+    const bookmarked = isHadithBookmarked(h.hadithnumber);
+    return `
+    <div class="ayah-row" data-hadithnumber="${h.hadithnumber}">
+      <div class="ayah-num">Hadith ${h.reference.hadith}${grade ? `<span class="grade-badge ${grade.weak?'weak':''}">${grade.text}</span>` : ''}</div>
+      ${arabic ? `<div class="ayah-arabic" style="font-size:19px;">${arabic}</div>` : ''}
+      <div class="ayah-translation" style="display:block;">${h.text}</div>
+      <div class="hadith-ref">${HADITH_COLLECTIONS[hadithState.collectionKey].nameEn} ${h.hadithnumber}</div>
+      <div class="ayah-controls">
+        <button class="listen-btn" data-num="${h.hadithnumber}">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Listen
+        </button>
+        <button class="mini-btn hadith-bookmark ${bookmarked?'active':''}" data-num="${h.hadithnumber}" aria-label="Bookmark hadith">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="${bookmarked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join("");
+
+  el.querySelectorAll(".listen-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const num = parseInt(btn.dataset.num,10);
+      const h = hadiths.find(x=>x.hadithnumber===num);
+      if (h) toggleHadithSpeech(h, btn);
+    });
+  });
+  el.querySelectorAll(".hadith-bookmark").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const num = parseInt(btn.dataset.num,10);
+      const h = hadiths.find(x=>x.hadithnumber===num);
+      if (h) toggleHadithBookmark(h);
+      renderHadithList(hadiths);
+    });
+  });
+}
+
+// --- Text-to-speech "Listen" (see the note above on why this isn't a
+// recorded reciter) ---
+let currentSpeechBtn = null;
+function stopHadithSpeech(){
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  if (currentSpeechBtn) currentSpeechBtn.classList.remove("playing");
+  currentSpeechBtn = null;
+}
+function toggleHadithSpeech(hadith, btn){
+  if (!("speechSynthesis" in window)){
+    showToast("Text-to-speech isn't supported in this browser.");
+    return;
+  }
+  if (currentSpeechBtn === btn){ stopHadithSpeech(); return; }
+  stopHadithSpeech();
+  const utter = new SpeechSynthesisUtterance(hadith.text);
+  utter.lang = "en-US";
+  utter.rate = 0.95;
+  utter.onend = ()=>{ btn.classList.remove("playing"); if (currentSpeechBtn===btn) currentSpeechBtn = null; };
+  utter.onerror = ()=>{ btn.classList.remove("playing"); if (currentSpeechBtn===btn) currentSpeechBtn = null; };
+  currentSpeechBtn = btn;
+  btn.classList.add("playing");
+  window.speechSynthesis.speak(utter);
+}
+
+function renderHadithBookmarksPane(){
+  const el = document.getElementById("hadithBookmarksList");
+  if (!state.hadithBookmarks.length){
+    el.innerHTML = `<div class="empty-note">No hadith bookmarked yet. Open any hadith and tap the star to save it here.</div>`;
+    return;
+  }
+  el.innerHTML = state.hadithBookmarks.map(b => `
+    <div class="surah-row bookmark-row" data-collection="${b.collectionKey}" data-book="${b.bookNumber}">
+      <div class="surah-badge"><svg viewBox="0 0 100 100">${starSVG({r:40,w:1.1})}</svg><span>${b.hadithInBook}</span></div>
+      <div class="surah-info">
+        <div class="surah-name-en">${b.collectionName} · ${b.hadithnumber}</div>
+        <div class="surah-meta">${b.textSnippet}</div>
+      </div>
+      <button class="mini-btn bookmark-remove" data-num="${b.hadithnumber}" data-collection="${b.collectionKey}" aria-label="Remove bookmark">✕</button>
+    </div>
+  `).join("");
+  el.querySelectorAll(".bookmark-row").forEach(row=>{
+    row.addEventListener("click", (e)=>{
+      if (e.target.closest(".bookmark-remove")) return;
+      openHadithCollection(row.dataset.collection).then(()=> openHadithBook(parseInt(row.dataset.book,10)));
+    });
+  });
+  el.querySelectorAll(".bookmark-remove").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      const num = parseInt(btn.dataset.num,10);
+      const colKey = btn.dataset.collection;
+      state.hadithBookmarks = state.hadithBookmarks.filter(b => !(b.collectionKey===colKey && b.hadithnumber===num));
+      persistSettings();
+      renderHadithBookmarksPane();
+    });
+  });
+}
+
+document.getElementById("collectionBukhariBtn").addEventListener("click", ()=> openHadithCollection("bukhari"));
+document.getElementById("collectionMuslimBtn").addEventListener("click", ()=> openHadithCollection("muslim"));
+document.getElementById("hadithBookListBackBtn").addEventListener("click", ()=> showHadithPane("collection"));
+document.getElementById("hadithReaderBackBtn").addEventListener("click", ()=>{ stopHadithSpeech(); showHadithPane("booklist"); });
+document.getElementById("hadithBookmarksBtn").addEventListener("click", ()=>{ renderHadithBookmarksPane(); showHadithPane("bookmarks"); });
+document.getElementById("hadithBookmarksBackBtn").addEventListener("click", ()=> showHadithPane("booklist"));
 
 /* ============================================================
    10. DU'A / DHIKR / NOTIFICATIONS
