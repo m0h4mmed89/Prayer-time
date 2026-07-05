@@ -12,6 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -830,6 +831,15 @@
     <button data-val="24">24-hour</button>
   </div>
 
+  <h3>Announcements</h3>
+  <div class="notif-card" style="margin-top:0;">
+    <div class="ni-text">
+      <div class="ni-title">Occasional du'a from the developer</div>
+      <div class="ni-sub">A du'a or announcement sent to everyone now and then — separate from your own reminders above, and works even when this site is closed.</div>
+    </div>
+    <div class="switch" id="broadcastSwitch"><div class="knob"></div></div>
+  </div>
+
   <h3>Support this project</h3>
   <p class="field-label" style="margin-top:-4px;">If Mawaqit has been useful to you, consider supporting its upkeep — hosting, the Qur'an API, and ongoing work.</p>
   <button class="btn donate-btn" id="donateBtn" style="width:100%; margin-top:0;">❤ Donate / Support Mawaqit</button>
@@ -846,6 +856,9 @@
   </p>
   <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
     Hadith text (Sahih al-Bukhari and Sahih Muslim, Arabic and English) streams live from an open hadith API, same approach as the Qur'an. One honest note: unlike the Qur'an, there isn't a reliable, licensed, per-hadith audio recitation source to draw on, so "Listen" uses your browser's built-in text-to-speech to read the English translation aloud rather than a recorded reciter.
+  </p>
+  <p style="font-size:12.5px; color:var(--muted); line-height:1.6; margin-top:8px;">
+    "Announcements" above are powered by OneSignal and are the only notifications in this app that can reach your device when the site is closed — everything else (prayer/du'a reminders, adhan) only runs while this tab is open, which is a browser limitation, not a choice.
   </p>
   <button class="btn btn-ghost" id="closeSheetBtn" style="width:100%;">Close</button>
 </div>
@@ -2790,12 +2803,61 @@ window.addEventListener("beforeinstallprompt", (e)=>{
 
 /* ============================================================
    12. SERVICE WORKER — offline shell + install support
+   Registers OneSignalSDKWorker.js (which internally imports both
+   OneSignal's push code and our own sw.js — see that file's comment)
+   rather than sw.js directly, since only one service worker can control
+   a given scope.
 ============================================================ */
 if ("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register("sw.js").catch(()=>{ /* offline-first is a bonus, not required */ });
+    navigator.serviceWorker.register("OneSignalSDKWorker.js").catch(()=>{ /* offline-first + broadcast notifications are bonuses, not required */ });
   });
 }
+
+/* ============================================================
+   12b. ONESIGNAL — lets the developer send an occasional dua or
+   announcement to every subscribed visitor's device, even when this
+   site isn't open. This is separate from the per-device local
+   reminders elsewhere in the app (those are scheduled by each person
+   for themselves; this is a one-to-many broadcast from the developer).
+============================================================ */
+const ONESIGNAL_APP_ID = "ee61c06f-a669-4bb8-b04f-2643e4300a1b";
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal){
+  try{
+    await OneSignal.init({ appId: ONESIGNAL_APP_ID });
+    syncBroadcastSwitchUI();
+    OneSignal.User.PushSubscription.addEventListener("change", syncBroadcastSwitchUI);
+  } catch(e){
+    // OneSignal not reachable/blocked — the rest of the app is unaffected either way
+  }
+});
+
+function isBroadcastSubscribed(){
+  try{ return !!(window.OneSignal && window.OneSignal.User.PushSubscription.optedIn); }
+  catch(e){ return false; }
+}
+
+function syncBroadcastSwitchUI(){
+  const el = document.getElementById("broadcastSwitch");
+  if (!el) return;
+  el.classList.toggle("on", isBroadcastSubscribed());
+}
+
+document.getElementById("broadcastSwitch").addEventListener("click", async ()=>{
+  if (!window.OneSignal){ showToast("Notifications aren't ready yet — try again in a moment."); return; }
+  try{
+    if (isBroadcastSubscribed()){
+      await window.OneSignal.User.PushSubscription.optOut();
+    } else {
+      await window.OneSignal.Notifications.requestPermission();
+      await window.OneSignal.User.PushSubscription.optIn();
+    }
+  } catch(e){
+    showToast("Couldn't update notification settings — check your browser's notification permission for this site.");
+  }
+  syncBroadcastSwitchUI();
+});
 
 /* ============================================================
    13. LOCATION
