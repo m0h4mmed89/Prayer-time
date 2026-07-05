@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Privacy Policy — Mawaqit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0E1F1B">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E1F1B; --ink-2:#0A1714; --surface:#15302A; --surface-2:#1C3B33;
+    --gold:#C9A24D; --gold-bright:#E5C374; --turquoise:#4FA897;
+    --parchment:#F3E9D2; --parchment-dim:#D9CDAE; --muted:#8FA39C;
+    --line: rgba(201,162,77,0.20);
+    --font-display: 'Spectral', Georgia, serif;
+    --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; min-height:100vh;
+    background: radial-gradient(120% 90% at 50% -10%, #1A3A32 0%, var(--ink) 55%, var(--ink-2) 100%);
+    color: var(--parchment); font-family: var(--font-ui); line-height:1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 640px; margin: 0 auto; padding: 40px 24px 80px; }
+  .back{
+    display:inline-flex; align-items:center; gap:6px; color: var(--muted); text-decoration:none;
+    font-size: 13px; margin-bottom: 24px;
+  }
+  .back:hover{ color: var(--gold-bright); }
+  h1{ font-family: var(--font-display); font-size: 28px; color: var(--gold-bright); margin: 0 0 6px; }
+  .updated{ font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+  h2{ font-family: var(--font-display); font-size: 19px; color: var(--gold-bright); margin: 36px 0 12px; }
+  p, li{ font-size: 14.5px; color: var(--parchment-dim); }
+  ul{ padding-left: 20px; }
+  li{ margin-bottom: 6px; }
+  a{ color: var(--turquoise); }
+  strong{ color: var(--parchment); }
+  .card{
+    background: var(--surface); border:1px solid var(--line); border-radius: 16px;
+    padding: 20px 22px; margin: 20px 0;
+  }
+  .short{ font-size: 15px; color: var(--parchment); }
+  footer{ margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Back to Mawaqit</a>
+  <h1>Privacy Policy</h1>
+  <div class="updated">Last updated: July 5, 2026</div>
+
+  <div class="card short">
+    Mawaqit doesn't have user accounts and doesn't sell your data. Your
+    location is used only to calculate prayer times and qibla direction, on
+    your own device — it isn't sent to us or stored on any server we
+    control. The app shows banner ads (unless you've purchased "Remove Ads"
+    in the native app) and offers optional push notifications, both handled
+    by the third-party providers named below — everything else stays
+    entirely on your device.
+  </div>
+
+  <h2>Information we collect</h2>
+  <p><strong>Location.</strong> With your permission, the app reads your device's
+  location to calculate accurate prayer times and the qibla direction for
+  where you are. This calculation happens entirely on your device. We do
+  not receive, store, or have access to your location — there is no server
+  of ours in this data path at all.</p>
+
+  <p><strong>Push notification identifier.</strong> If you opt in to
+  "Announcements," our notification provider, OneSignal, assigns your
+  device an identifier so we can send occasional messages (e.g. a du'a) to
+  everyone who's opted in. See <a href="https://onesignal.com/privacy_policy" target="_blank" rel="noopener">OneSignal's privacy policy</a>.
+  You can opt out at any time from the in-app toggle or your device/browser
+  notification settings.</p>
+
+  <p><strong>Advertising identifier (native app only).</strong> The app shows
+  banner ads served by Google AdMob on two screens, unless you've purchased
+  "Remove Ads." AdMob may use your device's advertising identifier to show
+  relevant ads. See <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google's ad policy</a>.
+  You can reset or limit this at the OS level, and iOS separately asks your
+  permission before this identifier can be used.</p>
+
+  <p><strong>Purchase information (native app only).</strong> If you buy "Remove
+  Ads," the purchase is processed by Apple/Google and recorded by our
+  billing provider, RevenueCat, so your ad-free status can be restored on
+  other devices. We don't receive your payment details — only that a
+  purchase was made. See <a href="https://www.revenuecat.com/privacy" target="_blank" rel="noopener">RevenueCat's privacy policy</a>.</p>
+
+  <p><strong>Nothing else.</strong> The app has no account creation, no login,
+  and doesn't collect your name, email, contacts, photos, or any other
+  personal information beyond what's described above. Your prayer-tracking
+  history, bookmarks, and preferences are stored only in local storage on
+  your own device and are never transmitted to us.</p>
+
+  <h2>Third-party content services</h2>
+  <p>To show Qur'an text/audio, hadith text, and place names, the app
+  fetches data directly from these public services when you use those
+  features. Requests go straight from your device to them — we don't
+  proxy or log these requests ourselves:</p>
+  <ul>
+    <li><strong>Al Quran Cloud API</strong> (alquran.cloud) — Qur'an text, translations</li>
+    <li><strong>Islamic Network CDN</strong> (cdn.islamic.network) — Qur'an recitation audio</li>
+    <li><strong>fawazahmed0/hadith-api</strong> (via jsdelivr CDN) — hadith text</li>
+    <li><strong>praytimes.org</strong> — adhan audio recordings</li>
+    <li><strong>OpenStreetMap Nominatim</strong> — converts coordinates to a place name; only used if you search a city or use device location</li>
+  </ul>
+  <p>Each operates under its own terms; none of them receive any information
+  from Mawaqit that identifies you personally beyond the specific request
+  being made (e.g. "fetch Surah 2").</p>
+
+  <h2>Notifications</h2>
+  <p>Two separate kinds: <strong>personal reminders</strong> (prayer alerts,
+  du'a reminders, adhan) are scheduled by you, for you, and never leave your
+  device. <strong>Announcements</strong> are the only kind that come from
+  us, via OneSignal, and only if you've opted in.</p>
+
+  <h2>Children's privacy</h2>
+  <p>Mawaqit doesn't knowingly collect personal information from anyone,
+  including children, and has no age-gated features since there's no
+  account system to begin with.</p>
+
+  <h2>Data retention &amp; deletion</h2>
+  <p>Since we don't hold your personal data on any server, there's nothing
+  for us to delete on request. To remove everything the app has stored,
+  delete the app (or clear this site's browsing data) — this clears all
+  local preferences, bookmarks, and prayer history. To stop announcements,
+  opt out in Settings or your notification settings.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy changes, we'll update the date at the top. Continued
+  use of the app after a change means you accept the updated policy.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy: <a href="mailto:your-email@example.com">your-email@example.com</a></p>
+
+  <footer>Mawaqit — prayer times, qibla, Qur'an &amp; hadith</footer>
+</div>
+</body>
+</html>
